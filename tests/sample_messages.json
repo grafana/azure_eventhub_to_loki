@@ -1,0 +1,38 @@
+[
+    {
+        "timeStamp": "2020-12-29 9:30:20",
+        "ipAddress": "123.45.60.45",
+        "userId": "469b775c-6ab0-48ce-b321-08dc26c3b6cf",
+        "sessionId": "a7f4b4bb-1107-4a35-b1dd-fb666de8edc7",
+        "path": "/.netlify/functions/registration",
+        "queryParameters": "?token=12345-ABCD",
+        "referrerUrl": "http://example.com/about.html",
+        "os": "Windows",
+        "browser": "Chrome",
+        "timeToCompletePage": 2100,
+        "eventFirstTimestamp": 365476,
+        "eventDuration": 1000,
+        "eventScore": 95,
+        "deviceType": "phone",
+        "isLead": true,
+        "diagnostics": ""
+    },
+    {
+        "timeStamp": "2020-12-25 10:12:23",
+        "ipAddress": "192.45.30.90",
+        "userId": "178f1cf3-effb-4d07-8c2f-3a5909724164",
+        "sessionId": "858560da-bb43-4f37-8c30-8e71d7ef71bb",
+        "path": "/.netlify/functions/productListing",
+        "queryParameters": "?category=furniture",
+        "referrerUrl": "http://example.com/product.html",
+        "os": "iOS",
+        "browser": "Safari",
+        "timeToCompletePage": 1800,
+        "eventFirstTimestamp": 236620,
+        "eventDuration": 1400,
+        "eventScore": 80,
+        "deviceType": "laptop",
+        "isLead": false,
+        "diagnostics": "Debug Info"
+    }
+]
