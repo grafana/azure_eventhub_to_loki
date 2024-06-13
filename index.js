@@ -19,7 +19,7 @@
 
 const { log } = require('console');
 const https = require('https');
-
+const version = '1.0.0';
 
 class FunctionSettings {
     constructor (env) {
