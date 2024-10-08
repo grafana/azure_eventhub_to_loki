@@ -1,7 +1,7 @@
 import azure.functions as func
 import dataclasses
 import logging
-from datetime import time 
+from datetime import datetime 
 
 app = func.FunctionApp()
 
@@ -16,12 +16,12 @@ def logexport(azeventhub: func.EventHubEvent):
 class Message:
     body: str
     attributes: dict
-    timestamp: time # TODO: support nanoseconds 
+    timestamp: datetime# TODO: support nanoseconds 
 
     @staticmethod
-    def from_json(json: dict) -> Message:
+    def from_json(json: dict):
         return Message(
             body=json["body"],
             attributes=json["attributes"],
-            timestamp=time.fromisoformat(json["timestamp"])
+            timestamp=datetime.fromisoformat(json["timestamp"])
         )
