@@ -6,6 +6,9 @@ dependencies = [
 name = "logexport"
 version = "0.1.0"
 
+[build-system]
+requires = ["setuptools >= 61.0"]
+
 [project.optional-dependencies]
 test = [
   "black==24.10.0",
