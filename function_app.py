@@ -1,7 +1,8 @@
 import json
 import azure.functions as func
+from collections.abc import Iterator
 import dataclasses
-import ijson
+import ijson  # type: ignore
 import logging
 from datetime import datetime
 
@@ -33,7 +34,7 @@ class Message:
         )
 
 
-def records(f):
+def records(f) -> Iterator[Message]:
     for i in ijson.items(f, "records.item"):
         # TODO: catch errors
         yield Message.from_json(i)
