@@ -5,6 +5,7 @@ import dataclasses
 import ijson  # type: ignore
 import logging
 from datetime import datetime
+from gen import push_pb2
 
 app = func.FunctionApp()
 
@@ -15,26 +16,28 @@ app = func.FunctionApp()
     connection="cspazure_logsexport_EVENTHUB",
 )
 def logexport(azeventhub: func.EventHubEvent):
-    messages = list(records(azeventhub.get_body()))
-    logging.info("Python EventHub trigger processed an event: %s", messages)
+    #logging.info("Python EventHub trigger processed an event: %s", azeventhub.get_body().decode('utf-8'))
+    stream = StreamFromEvent(azeventhub.get_body())
+    logging.info("Python EventHub trigger processed an event: %s", stream)
+
+def EntryFromJson(load: dict) -> push_pb2.EntryAdapter:
+    entry = push_pb2.EntryAdapter()
+    entry.timestamp.FromJsonString(load["time"])
+    # TODO: decide what should be metadata
+    labels = [push_pb2.LabelPairAdapter(name=k, value=str(v)) for k, v in load["properties"].items()]
+    entry.structuredMetadata.extend(labels)
+    # TODO: decide what the body should be
+    entry.line = json.dumps(load) 
+
+    return entry
 
 
-@dataclasses.dataclass
-class Message:
-    body: str
-    attributes: dict
-    timestamp: datetime  # TODO: support nanoseconds
+def StreamFromEvent(f) -> push_pb2.StreamAdapter:
+    stream = push_pb2.StreamAdapter()
 
-    @staticmethod
-    def from_json(load: dict):
-        return Message(
-            body=json.dumps(load),  # TODO: decide what the body should be
-            attributes={k: v for k, v in load["properties"].items()},
-            timestamp=datetime.fromisoformat(load["time"]),
-        )
-
-
-def records(f) -> Iterator[Message]:
+    # TODO: decide what should be stream labels
+    stream.labels = """{foo="bar"}"""
     for i in ijson.items(f, "records.item"):
-        # TODO: catch errors
-        yield Message.from_json(i)
+        stream.entries.append(EntryFromJson(i))
+
+    return stream

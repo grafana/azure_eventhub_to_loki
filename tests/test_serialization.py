@@ -1,21 +1,20 @@
 import json
-from function_app import Message, records
+from function_app import EntryFromJson, StreamFromEvent 
+from gen import push_pb2
 
 
 def test_deserialization_message():
     load = {"properties": {"key": "value"}, "time": "2024-06-05T10:47:31.676Z"}
-    message = Message.from_json(load)
-    assert json.loads(message.body) == {
+    entry = EntryFromJson(load)
+    assert json.loads(entry.line) == {
         "time": "2024-06-05T10:47:31.676Z",
         "properties": {"key": "value"},
     }
-    assert message.attributes == {"key": "value"}
-    assert message.timestamp.day == 5
+    assert entry.structuredMetadata == [push_pb2.LabelPairAdapter(name="key", value="value")]
+    assert entry.timestamp.ToSeconds() == 1717584451
 
 
 def test_deserialization_records():
-    messages = list()
     with open("tests/record_sample.json", "rb") as f:
-        messages = list(records(f))
-
-    assert len(messages) == 2
+        stream = StreamFromEvent(f)
+        assert len(stream.entries) == 2

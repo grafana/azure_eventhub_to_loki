@@ -2,6 +2,7 @@
 dependencies = [
   "azure-functions==1.21.1",
   "ijson==3.3.0",
+  "protobuf==5.28.2",
 ]
 name = "logexport"
 version = "0.1.0"
@@ -13,6 +14,7 @@ requires = ["setuptools >= 61.0"]
 test = [
   "black==24.10.0",
   "mypy==1.11.2",
+  "types-protobuf==5.28.0.20240924",
   "pytest==8.3.3",
 ]
 
@@ -20,3 +22,10 @@ test = [
 pythonpath = [
   ".",
 ]
+
+[tool.setuptools]
+packages = ["gen"]
+
+[[tool.mypy.overrides]]
+disable_error_code = ["misc"]
+module = ["gen.gogoproto.*"]
