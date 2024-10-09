@@ -1,4 +1,4 @@
-from gen.gogoproto import gogo_pb2 as _gogo_pb2
+from push.gogoproto import gogo_pb2 as _gogo_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor

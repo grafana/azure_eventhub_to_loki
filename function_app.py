@@ -1,11 +1,10 @@
 import json
 import azure.functions as func
 from collections.abc import Iterator
-import dataclasses
 import ijson  # type: ignore
 import logging
 from datetime import datetime
-from gen import push_pb2
+from push import push_pb2
 
 app = func.FunctionApp()
 
