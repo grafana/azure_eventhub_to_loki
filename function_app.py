@@ -15,7 +15,6 @@ app = func.FunctionApp()
     connection="cspazure_logsexport_EVENTHUB",
 )
 def logexport(azeventhub: func.EventHubEvent):
-    #logging.info("Python EventHub trigger processed an event: %s", azeventhub.get_body().decode('utf-8'))
     stream = StreamFromEvent(azeventhub.get_body())
     logging.info("Python EventHub trigger processed an event: %s", stream)
 
