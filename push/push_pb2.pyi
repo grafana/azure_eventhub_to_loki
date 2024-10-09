@@ -1,4 +1,3 @@
-from push.gogoproto import gogo_pb2 as _gogo_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
@@ -36,13 +35,11 @@ class LabelPairAdapter(_message.Message):
     def __init__(self, name: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
 
 class EntryAdapter(_message.Message):
-    __slots__ = ("timestamp", "line", "structuredMetadata", "parsed")
+    __slots__ = ("timestamp", "line", "structuredMetadata")
     TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
     LINE_FIELD_NUMBER: _ClassVar[int]
     STRUCTUREDMETADATA_FIELD_NUMBER: _ClassVar[int]
-    PARSED_FIELD_NUMBER: _ClassVar[int]
     timestamp: _timestamp_pb2.Timestamp
     line: str
     structuredMetadata: _containers.RepeatedCompositeFieldContainer[LabelPairAdapter]
-    parsed: _containers.RepeatedCompositeFieldContainer[LabelPairAdapter]
-    def __init__(self, timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., line: _Optional[str] = ..., structuredMetadata: _Optional[_Iterable[_Union[LabelPairAdapter, _Mapping]]] = ..., parsed: _Optional[_Iterable[_Union[LabelPairAdapter, _Mapping]]] = ...) -> None: ...
+    def __init__(self, timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., line: _Optional[str] = ..., structuredMetadata: _Optional[_Iterable[_Union[LabelPairAdapter, _Mapping]]] = ...) -> None: ...

@@ -9,8 +9,3 @@ plugins:
     out: push
 inputs:
   - proto_file: push.proto
-  - module: buf.build/gogo/protobuf
-  # - git_repo: https://github.com/grafana/loki.git
-  #   tag: v3.2.0
-  #   subdir: pkg/push 
-  #   depth: 2

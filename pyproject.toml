@@ -25,7 +25,3 @@ pythonpath = [
 
 [tool.setuptools]
 packages = ["gen"]
-
-[[tool.mypy.overrides]]
-disable_error_code = ["misc"]
-module = ["gen.gogoproto.*"]

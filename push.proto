@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package logproto;
 
-import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/grafana/loki/pkg/push";
@@ -12,22 +11,16 @@ service Pusher {
 }
 
 message PushRequest {
-  repeated StreamAdapter streams = 1 [
-    (gogoproto.jsontag) = "streams",
-    (gogoproto.customtype) = "Stream"
-  ];
+  repeated StreamAdapter streams = 1;
 }
 
 message PushResponse {}
 
 message StreamAdapter {
-  string labels = 1 [(gogoproto.jsontag) = "labels"];
-  repeated EntryAdapter entries = 2 [
-    (gogoproto.nullable) = false,
-    (gogoproto.jsontag) = "entries"
-  ];
+  string labels = 1;
+  repeated EntryAdapter entries = 2;
   // hash contains the original hash of the stream.
-  uint64 hash = 3 [(gogoproto.jsontag) = "-"];
+  uint64 hash = 3;
 }
 
 message LabelPairAdapter {
@@ -36,21 +29,7 @@ message LabelPairAdapter {
 }
 
 message EntryAdapter {
-  google.protobuf.Timestamp timestamp = 1 [
-    (gogoproto.stdtime) = true,
-    (gogoproto.nullable) = false,
-    (gogoproto.jsontag) = "ts"
-  ];
-  string line = 2 [(gogoproto.jsontag) = "line"];
-  repeated LabelPairAdapter structuredMetadata = 3 [
-    (gogoproto.nullable) = false,
-    (gogoproto.jsontag) = "structuredMetadata,omitempty"
-  ];
-  // This field shouldn't be used by clients to push data to Loki.
-  // It is only used by Loki to return parsed log lines in query responses.
-  // TODO: Remove this field from the write path Proto.
-  repeated LabelPairAdapter parsed = 4 [
-    (gogoproto.nullable) = false,
-    (gogoproto.jsontag) = "parsed,omitempty"
-  ];
+  google.protobuf.Timestamp timestamp = 1;
+  string line = 2;
+  repeated LabelPairAdapter structuredMetadata = 3;
 }
