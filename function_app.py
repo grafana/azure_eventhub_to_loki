@@ -4,7 +4,7 @@ from collections.abc import Iterator
 import ijson  # type: ignore
 import logging
 from datetime import datetime
-from push import push_pb2
+from logexport.push import push_pb2
 
 app = func.FunctionApp()
 

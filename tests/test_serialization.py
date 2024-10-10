@@ -1,6 +1,6 @@
 import json
 from function_app import EntryFromJson, StreamFromEvent 
-from push import push_pb2
+from logexport.push import push_pb2
 
 
 def test_deserialization_message():

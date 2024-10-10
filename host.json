@@ -1,5 +1,8 @@
 {
   "version": "2.0",
+  "extensions": {
+    "eventHubs": {}
+  },
   "logging": {
     "applicationInsights": {
       "samplingSettings": {
