@@ -10,7 +10,7 @@ app = func.FunctionApp()
 
 
 @app.event_hub_message_trigger(
-    arg_name="azeventhub",
+    arg_name="azeventhub", # TODO: make this configurable
     event_hub_name="cspazure",
     connection="cspazure_logsexport_EVENTHUB",
 )
