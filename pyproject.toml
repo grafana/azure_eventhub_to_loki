@@ -1,15 +1,15 @@
 [project]
 authors = [
-  { name = "Grafana Labs" },
+  {name = "Grafana Labs"},
 ]
-description = "Azure function to send eventhub events to Grafana Loki / Grafana Cloud"
 dependencies = [
   "azure-functions==1.21.1",
   "ijson==3.3.0",
   "protobuf==5.28.2",
 ]
+description = "Azure function to send eventhub events to Grafana Loki / Grafana Cloud"
 name = "logexport"
-requires-python = ">= 3.10"
+requires-python = ">= 3.11"
 version = "0.1.0"
 
 [build-system]
@@ -29,4 +29,4 @@ pythonpath = [
 ]
 
 [tool.setuptools]
-packages = ["push"]
+packages = ["logexport", "logexport.push"]

@@ -25,14 +25,14 @@ _sym_db = _symbol_database.Default()
 from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\npush.proto\x12\x08logproto\x1a\x1fgoogle/protobuf/timestamp.proto\"@\n\x0bPushRequest\x12\x31\n\x07streams\x18\x01 \x03(\x0b\x32\x17.logproto.StreamAdapterR\x07streams\"\x0e\n\x0cPushResponse\"m\n\rStreamAdapter\x12\x16\n\x06labels\x18\x01 \x01(\tR\x06labels\x12\x30\n\x07\x65ntries\x18\x02 \x03(\x0b\x32\x16.logproto.EntryAdapterR\x07\x65ntries\x12\x12\n\x04hash\x18\x03 \x01(\x04R\x04hash\"<\n\x10LabelPairAdapter\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value\"\xa8\x01\n\x0c\x45ntryAdapter\x12\x38\n\ttimestamp\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\ttimestamp\x12\x12\n\x04line\x18\x02 \x01(\tR\x04line\x12J\n\x12structuredMetadata\x18\x03 \x03(\x0b\x32\x1a.logproto.LabelPairAdapterR\x12structuredMetadata2A\n\x06Pusher\x12\x37\n\x04Push\x12\x15.logproto.PushRequest\x1a\x16.logproto.PushResponse\"\x00\x42{\n\x0c\x63om.logprotoB\tPushProtoP\x01Z github.com/grafana/loki/pkg/push\xa2\x02\x03LXX\xaa\x02\x08Logproto\xca\x02\x08Logproto\xe2\x02\x14Logproto\\GPBMetadata\xea\x02\x08Logprotob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\npush.proto\x12\x08logproto\x1a\x1fgoogle/protobuf/timestamp.proto\"@\n\x0bPushRequest\x12\x31\n\x07streams\x18\x01 \x03(\x0b\x32\x17.logproto.StreamAdapterR\x07streams\"\x0e\n\x0cPushResponse\"m\n\rStreamAdapter\x12\x16\n\x06labels\x18\x01 \x01(\tR\x06labels\x12\x30\n\x07\x65ntries\x18\x02 \x03(\x0b\x32\x16.logproto.EntryAdapterR\x07\x65ntries\x12\x12\n\x04hash\x18\x03 \x01(\x04R\x04hash\"<\n\x10LabelPairAdapter\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value\"\xa8\x01\n\x0c\x45ntryAdapter\x12\x38\n\ttimestamp\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\ttimestamp\x12\x12\n\x04line\x18\x02 \x01(\tR\x04line\x12J\n\x12structuredMetadata\x18\x03 \x03(\x0b\x32\x1a.logproto.LabelPairAdapterR\x12structuredMetadata2A\n\x06Pusher\x12\x37\n\x04Push\x12\x15.logproto.PushRequest\x1a\x16.logproto.PushResponse\"\x00\x42Y\n\x0c\x63om.logprotoB\tPushProtoP\x01\xa2\x02\x03LXX\xaa\x02\x08Logproto\xca\x02\x08Logproto\xe2\x02\x14Logproto\\GPBMetadata\xea\x02\x08Logprotob\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'push_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
-  _globals['DESCRIPTOR']._serialized_options = b'\n\014com.logprotoB\tPushProtoP\001Z github.com/grafana/loki/pkg/push\242\002\003LXX\252\002\010Logproto\312\002\010Logproto\342\002\024Logproto\\GPBMetadata\352\002\010Logproto'
+  _globals['DESCRIPTOR']._serialized_options = b'\n\014com.logprotoB\tPushProtoP\001\242\002\003LXX\252\002\010Logproto\312\002\010Logproto\342\002\024Logproto\\GPBMetadata\352\002\010Logproto'
   _globals['_PUSHREQUEST']._serialized_start=57
   _globals['_PUSHREQUEST']._serialized_end=121
   _globals['_PUSHRESPONSE']._serialized_start=123

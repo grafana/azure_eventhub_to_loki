@@ -9,14 +9,20 @@ from logexport.push import push_pb2
 app = func.FunctionApp()
 
 
+
+@app.function_name(name="logexport")
 @app.event_hub_message_trigger(
     arg_name="azeventhub", # TODO: make this configurable
     event_hub_name="cspazure",
     connection="cspazure_logsexport_EVENTHUB",
 )
 def logexport(azeventhub: func.EventHubEvent):
-    stream = StreamFromEvent(azeventhub.get_body())
-    logging.info("Python EventHub trigger processed an event: %s", stream)
+    try:
+        #logging.info("Python EventHub trigger processed an event: %s", azeventhub.get_body().decode('utf-8'))
+        stream = StreamFromEvent(azeventhub.get_body())
+        logging.info("Python EventHub trigger processed an event: %s", stream)
+    except Exception:
+        logging.exception("failed to process event")
 
 def EntryFromJson(load: dict) -> push_pb2.EntryAdapter:
     entry = push_pb2.EntryAdapter()
