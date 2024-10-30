@@ -9,28 +9,35 @@ from logexport.push import push_pb2
 app = func.FunctionApp()
 
 
-
 @app.function_name(name="logexport")
 @app.event_hub_message_trigger(
-    arg_name="azeventhub", # TODO: make this configurable
+    arg_name="azeventhub",  # TODO: make this configurable
     event_hub_name="cspazure",
     connection="cspazure_logsexport_EVENTHUB",
 )
 def logexport(azeventhub: func.EventHubEvent):
     try:
         stream = StreamFromEvent(azeventhub.get_body())
-        logging.info("Python EventHub trigger processed an %d events: %s", len(stream.entries), stream)
+        logging.info(
+            "Python EventHub trigger processed an %d events: %s",
+            len(stream.entries),
+            stream,
+        )
     except Exception:
         logging.exception("failed to process event")
+
 
 def EntryFromJson(load: dict) -> push_pb2.EntryAdapter:
     entry = push_pb2.EntryAdapter()
     entry.timestamp.FromJsonString(load["time"])
     # TODO: decide what should be metadata
-    labels = [push_pb2.LabelPairAdapter(name=k, value=str(v)) for k, v in load["properties"].items()]
+    labels = [
+        push_pb2.LabelPairAdapter(name=k, value=str(v))
+        for k, v in load["properties"].items()
+    ]
     entry.structuredMetadata.extend(labels)
     # TODO: decide what the body should be
-    entry.line = json.dumps(load) 
+    entry.line = json.dumps(load)
 
     return entry
 

@@ -2,7 +2,13 @@ from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
+from typing import (
+    ClassVar as _ClassVar,
+    Iterable as _Iterable,
+    Mapping as _Mapping,
+    Optional as _Optional,
+    Union as _Union,
+)
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -10,7 +16,9 @@ class PushRequest(_message.Message):
     __slots__ = ("streams",)
     STREAMS_FIELD_NUMBER: _ClassVar[int]
     streams: _containers.RepeatedCompositeFieldContainer[StreamAdapter]
-    def __init__(self, streams: _Optional[_Iterable[_Union[StreamAdapter, _Mapping]]] = ...) -> None: ...
+    def __init__(
+        self, streams: _Optional[_Iterable[_Union[StreamAdapter, _Mapping]]] = ...
+    ) -> None: ...
 
 class PushResponse(_message.Message):
     __slots__ = ()
@@ -24,7 +32,12 @@ class StreamAdapter(_message.Message):
     labels: str
     entries: _containers.RepeatedCompositeFieldContainer[EntryAdapter]
     hash: int
-    def __init__(self, labels: _Optional[str] = ..., entries: _Optional[_Iterable[_Union[EntryAdapter, _Mapping]]] = ..., hash: _Optional[int] = ...) -> None: ...
+    def __init__(
+        self,
+        labels: _Optional[str] = ...,
+        entries: _Optional[_Iterable[_Union[EntryAdapter, _Mapping]]] = ...,
+        hash: _Optional[int] = ...,
+    ) -> None: ...
 
 class LabelPairAdapter(_message.Message):
     __slots__ = ("name", "value")
@@ -32,7 +45,9 @@ class LabelPairAdapter(_message.Message):
     VALUE_FIELD_NUMBER: _ClassVar[int]
     name: str
     value: str
-    def __init__(self, name: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    def __init__(
+        self, name: _Optional[str] = ..., value: _Optional[str] = ...
+    ) -> None: ...
 
 class EntryAdapter(_message.Message):
     __slots__ = ("timestamp", "line", "structuredMetadata")
@@ -42,4 +57,11 @@ class EntryAdapter(_message.Message):
     timestamp: _timestamp_pb2.Timestamp
     line: str
     structuredMetadata: _containers.RepeatedCompositeFieldContainer[LabelPairAdapter]
-    def __init__(self, timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., line: _Optional[str] = ..., structuredMetadata: _Optional[_Iterable[_Union[LabelPairAdapter, _Mapping]]] = ...) -> None: ...
+    def __init__(
+        self,
+        timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...,
+        line: _Optional[str] = ...,
+        structuredMetadata: _Optional[
+            _Iterable[_Union[LabelPairAdapter, _Mapping]]
+        ] = ...,
+    ) -> None: ...

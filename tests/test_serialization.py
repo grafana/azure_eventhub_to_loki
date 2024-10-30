@@ -1,5 +1,5 @@
 import json
-from function_app import EntryFromJson, StreamFromEvent 
+from function_app import EntryFromJson, StreamFromEvent
 from logexport.push import push_pb2
 
 
@@ -10,7 +10,9 @@ def test_deserialization_message():
         "time": "2024-06-05T10:47:31.676Z",
         "properties": {"key": "value"},
     }
-    assert entry.structuredMetadata == [push_pb2.LabelPairAdapter(name="key", value="value")]
+    assert entry.structuredMetadata == [
+        push_pb2.LabelPairAdapter(name="key", value="value")
+    ]
     assert entry.timestamp.ToSeconds() == 1717584451
 
 
