@@ -1,4 +1,5 @@
 import json
+import os
 import azure.functions as func
 from collections.abc import Iterator
 import ijson  # type: ignore
@@ -9,11 +10,11 @@ from logexport.push import push_pb2
 app = func.FunctionApp()
 
 
-@app.function_name(name="logexport")
+@app.function_name(name=os.getenv("FUNCTION_NAME", default="logexport"))
 @app.event_hub_message_trigger(
     arg_name="azeventhub",  # TODO: make this configurable
-    event_hub_name="cspazure",
-    connection="cspazure_logsexport_EVENTHUB",
+    event_hub_name=os.getenv("EVENTHUB_NAME"),
+    connection="EVENTHUB_CONNECTION",
     cardinality="many",
 )
 def logexport(azeventhub: func.EventHubEvent):
