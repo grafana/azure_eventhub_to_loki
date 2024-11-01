@@ -17,7 +17,7 @@ jobs:
         pip install .[test]
         pip install .[package]
     - run: mypy function_app.py logexport
-    - run: black --check .
+    - run: black --exclude "logexport/_version.py" function_app.py logexport
     - run: pytest .
     - name: Package
       run: make clean "logexport.$(python -m setuptools_scm).zip"
