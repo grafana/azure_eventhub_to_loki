@@ -5,19 +5,19 @@ on: [ push, pull_request ]
 jobs:
   build:
     runs-on: ubuntu-latest
-      steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11.7' 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install .
-          pip install .[test]
-          pip install .[package]
-      - run: mypy function_app.py
-      - run: black --check .
-      - run: pytest .
-      - name: Package
-        run: make clean "logexport.$(python -m setuptools_scm).zip"
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11.7' 
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install .
+        pip install .[test]
+        pip install .[package]
+    - run: mypy function_app.py
+    - run: black --check .
+    - run: pytest .
+    - name: Package
+      run: make clean "logexport.$(python -m setuptools_scm).zip"
