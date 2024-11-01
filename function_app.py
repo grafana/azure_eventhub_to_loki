@@ -9,7 +9,7 @@ app = func.FunctionApp()
 
 @app.function_name(name=os.getenv("FUNCTION_NAME", default="logexport"))
 @app.event_hub_message_trigger(
-    arg_name="azeventhub",  # TODO: make this configurable
+    arg_name="azeventhub",
     event_hub_name=os.getenv("EVENTHUB_NAME"),
     connection="EVENTHUB_CONNECTION",
     cardinality="many",

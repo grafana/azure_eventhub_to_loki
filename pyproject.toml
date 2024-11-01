@@ -20,7 +20,7 @@ requires = ["setuptools>=64", "setuptools-scm>=8"]
 test = [
   "black==24.10.0",
   "mypy==1.11.2",
-  "types-protobuf==5.28.3",
+  "types-protobuf==5.28.3.20241030",
   "pytest==8.3.3",
 ]
 package = [
