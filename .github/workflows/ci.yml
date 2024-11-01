@@ -20,4 +20,4 @@ jobs:
       - run: black --check .
       - run: pytest .
       - name: Package
-        run: make "logexport.$(python -m setuptools_scm).zip"
+        run: make clean "logexport.$(python -m setuptools_scm).zip"

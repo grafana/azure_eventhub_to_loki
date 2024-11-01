@@ -2,7 +2,7 @@
 .PHONY: clean
 clean:
 	rm -rf .python_packages
-	rm -f logexport.zip
+	rm -f logexport*.zip
 
 .PHONY: protos
 protos: push.proto buf.gen.yaml buf.yaml
