@@ -14,6 +14,7 @@ app = func.FunctionApp()
     arg_name="azeventhub",  # TODO: make this configurable
     event_hub_name="cspazure",
     connection="cspazure_logsexport_EVENTHUB",
+    cardinality="many",
 )
 def logexport(azeventhub: func.EventHubEvent):
     try:
