@@ -18,6 +18,7 @@ app = func.FunctionApp()
     cardinality="many",
 )
 def logexport(azeventhub: func.EventHubEvent):
+    logging.info("Running version %s", logexport.version)
     try:
         stream = StreamFromEvent(azeventhub.get_body())
         logging.info(

@@ -10,10 +10,11 @@ dependencies = [
 description = "Azure function to send eventhub events to Grafana Loki / Grafana Cloud"
 name = "logexport"
 requires-python = ">= 3.11"
-version = "0.1.0"
+dynamic = ["version"]
 
 [build-system]
-requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools>=64", "setuptools-scm>=8"]
 
 [project.optional-dependencies]
 test = [
@@ -30,3 +31,6 @@ pythonpath = [
 
 [tool.setuptools]
 packages = ["logexport", "logexport.push"]
+
+[tool.setuptools_scm]
+version_file = "logexport/_version.py"
