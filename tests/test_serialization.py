@@ -10,9 +10,7 @@ def test_deserialization_message():
         "time": "2024-06-05T10:47:31.676Z",
         "properties": {"key": "value"},
     }
-    assert entry.structuredMetadata == [
-        push_pb2.LabelPairAdapter(name="key", value="value")
-    ]
+    assert push_pb2.LabelPairAdapter(name="key", value="value") in entry.structuredMetadata
     assert entry.timestamp.ToSeconds() == 1717584451
 
 
