@@ -1,5 +1,5 @@
 import json
-from function_app import EntryFromJson, StreamFromEvent
+from logexport.deserialize import EntryFromJson, StreamFromEvent
 from logexport.push import push_pb2
 
 
