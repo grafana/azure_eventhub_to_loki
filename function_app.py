@@ -10,10 +10,11 @@ if "EVENTHUB_NAME" not in os.environ:
     logging.error("EVENTHUB_NAME environment variable is not set")
     exit(1)
 
+
 @app.function_name(name=os.getenv("FUNCTION_NAME", default="logexport"))
 @app.event_hub_message_trigger(
     arg_name="azeventhub",
-    event_hub_name=os.environ.get("EVENTHUB_NAME") or '',
+    event_hub_name=os.environ.get("EVENTHUB_NAME") or "",
     connection="EVENTHUB_CONNECTION",
     cardinality="many",
 )
