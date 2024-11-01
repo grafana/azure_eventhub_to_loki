@@ -15,5 +15,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install .
           pip install .[test]
+          pip install .[package]
       - run: mypy function_app.py
       - run: black --check .
+      - run: pytest .
+      - name: Package
+        run: make "logexport.$(python -m setuptools_scm).zip"
