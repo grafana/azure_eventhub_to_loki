@@ -1,8 +1,10 @@
-import ijson  # type: ignore
 import json
+from collections.abc import Iterable
+
+import ijson  # type: ignore
+
 from logexport._version import __version__
 from logexport.push import push_pb2
-from collections.abc import Iterable
 
 
 def entry_from_json(load: dict) -> push_pb2.EntryAdapter:

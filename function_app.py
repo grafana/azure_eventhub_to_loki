@@ -1,10 +1,12 @@
-import os
-import azure.functions as func
 import logging
+import os
+from collections.abc import Iterable
 from datetime import datetime
+from typing import Final
+
+import azure.functions as func
 from logexport.deserialize import streams_from_event
 from logexport.loki import LokiClient
-from typing import Final
 
 # Constants defining environment variables names
 EVENTHUB_NAME_VAR: Final[str] = "EVENTHUB_NAME"
@@ -31,7 +33,7 @@ if "EVENTHUB_NAME" not in os.environ:
     connection=EVENTHUB_CONNECTION_VAR,  # the parameter expects the env var name not the value.
     cardinality="many",
 )
-def logexport(azeventhub: list[func.EventHubEvent]):
+def logexport(azeventhub: Iterable[func.EventHubEvent]):
     try:
         streams = streams_from_event((event.get_body() for event in azeventhub))
         logging.info(

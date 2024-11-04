@@ -1,9 +1,11 @@
+import urllib
+from collections.abc import Iterable
+
 import requests
 from requests import Request
 from requests.auth import HTTPBasicAuth
-import urllib
+
 from logexport.push import push_pb2
-from collections.abc import Iterable
 
 
 class LokiClient:
