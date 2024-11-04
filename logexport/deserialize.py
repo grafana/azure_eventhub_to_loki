@@ -1,5 +1,6 @@
 import json
 from collections.abc import Iterable
+from typing import Final
 
 import ijson  # type: ignore
 
@@ -7,14 +8,15 @@ from logexport._version import __version__
 from logexport.push import push_pb2
 
 
+VERSION_LABEL_KEY: Final[str] = "__grafana_azure_logexport_version__"
+
+
 def entry_from_json(load: dict) -> push_pb2.EntryAdapter:
     entry = push_pb2.EntryAdapter()
     entry.timestamp.FromJsonString(get_timestamp(load))
 
     # Add version information to the metadata
-    entry.structuredMetadata.add(
-        name="__grafana_azure_logexport_version__", value=__version__
-    )
+    entry.structuredMetadata.add(name=VERSION_LABEL_KEY, value=__version__)
 
     # TODO: decide what the body should be
     entry.line = json.dumps(load)

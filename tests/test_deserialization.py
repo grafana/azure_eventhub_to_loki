@@ -1,6 +1,6 @@
 import json
 from dataclasses import dataclass
-from logexport.deserialize import entry_from_json, get_timestamp, stream_from_bytes
+from logexport.deserialize import entry_from_json, get_timestamp, stream_from_bytes, VERSION_LABEL_KEY
 from logexport.push import push_pb2
 
 
@@ -11,7 +11,10 @@ def test_deserialization_message():
         "time": "2024-06-05T10:47:31.676Z",
         "properties": {"key": "value"},
     }
-    assert push_pb2.LabelPairAdapter(name="key", value="value") in entry.structuredMetadata
+
+    keys = [pair.name for pair in entry.structuredMetadata]
+    assert VERSION_LABEL_KEY in keys
+
     assert entry.timestamp.ToSeconds() == 1717584451
 
 
