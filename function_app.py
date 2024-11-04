@@ -1,7 +1,6 @@
 import logging
 import os
 from collections.abc import Iterable
-from datetime import datetime
 from typing import Final
 
 import azure.functions as func
