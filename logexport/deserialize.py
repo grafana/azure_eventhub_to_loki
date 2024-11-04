@@ -6,7 +6,8 @@ from logexport.push import push_pb2
 
 def EntryFromJson(load: dict) -> push_pb2.EntryAdapter:
     entry = push_pb2.EntryAdapter()
-    entry.timestamp.FromJsonString(load["time"])
+    entry.timestamp.FromJsonString(getTimestamp(load))
+
     # TODO: decide what should be metadata
     labels = [
         push_pb2.LabelPairAdapter(name=k, value=str(v))
@@ -34,3 +35,6 @@ def StreamFromEvent(f) -> push_pb2.StreamAdapter:
         stream.entries.append(EntryFromJson(i))
 
     return stream
+
+def getTimestamp(load: dict) -> str:
+    return load.get("timeStamp") or load.get("timestamp") or load.get("time") or load.get("created")
