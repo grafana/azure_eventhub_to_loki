@@ -2,7 +2,7 @@ import os
 import azure.functions as func
 import logging
 from datetime import datetime
-from logexport.deserialize import stream_from_event
+from logexport.deserialize import streams_from_event
 from logexport.loki import LokiClient
 from typing import Final
 
@@ -31,14 +31,13 @@ if "EVENTHUB_NAME" not in os.environ:
     connection=EVENTHUB_CONNECTION_VAR,  # the parameter expects the env var name not the value.
     cardinality="many",
 )
-def logexport(azeventhub: func.EventHubEvent):
+def logexport(azeventhub: list[func.EventHubEvent]):
     try:
-        stream = stream_from_event(azeventhub.get_body())
+        streams = streams_from_event((event.get_body() for event in azeventhub))
         logging.info(
-            "Python EventHub trigger processed an %d events: %s",
-            len(stream.entries),
-            stream,
+            "Python EventHub trigger processed a %d events",
+            len(azeventhub),
         )
-        loki_client.push(stream)
+        loki_client.push(streams)
     except Exception:
         logging.exception("failed to process event")

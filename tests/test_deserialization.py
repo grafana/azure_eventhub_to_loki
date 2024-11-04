@@ -1,6 +1,6 @@
 import json
 from dataclasses import dataclass
-from logexport.deserialize import entry_from_json, get_timestamp, stream_from_event
+from logexport.deserialize import entry_from_json, get_timestamp, stream_from_file
 from logexport.push import push_pb2
 
 
@@ -17,7 +17,7 @@ def test_deserialization_message():
 
 def test_deserialization_records():
     with open("tests/record_sample.json", "rb") as f:
-        stream = stream_from_event(f)
+        stream = stream_from_file(f)
         assert len(stream.entries) == 2
 
 def test_deserialization_timestamp():

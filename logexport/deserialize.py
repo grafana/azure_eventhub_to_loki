@@ -2,6 +2,7 @@ import ijson  # type: ignore
 import json
 from logexport._version import __version__
 from logexport.push import push_pb2
+from collections.abc import Iterable
 
 
 def entry_from_json(load: dict) -> push_pb2.EntryAdapter:
@@ -26,15 +27,20 @@ def entry_from_json(load: dict) -> push_pb2.EntryAdapter:
     return entry
 
 
-def stream_from_event(f) -> push_pb2.StreamAdapter:
+def stream_from_bytes(f) -> push_pb2.StreamAdapter:
     stream = push_pb2.StreamAdapter()
 
     # TODO: decide what should be stream labels
-    stream.labels = """{foo="bar"}"""
+    stream.labels = """{job="integrations/azure-logexport"}"""
     for i in ijson.items(f, "records.item"):
         stream.entries.append(entry_from_json(i))
 
     return stream
+
+
+def streams_from_event(events: Iterable[bytes]) -> Iterable[push_pb2.StreamAdapter]:
+    for event in events:
+        yield stream_from_bytes(event)
 
 
 def get_timestamp(load: dict) -> str:
