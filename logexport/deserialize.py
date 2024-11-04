@@ -7,7 +7,6 @@ import ijson  # type: ignore
 from logexport._version import __version__
 from logexport.push import push_pb2
 
-
 VERSION_LABEL_KEY: Final[str] = "__grafana_azure_logexport_version__"
 
 
