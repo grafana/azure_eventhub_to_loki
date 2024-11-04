@@ -2,7 +2,7 @@ import urllib.parse
 from collections.abc import Iterable
 
 import requests
-from requests import Request
+from requests import HTTPError, Request
 from requests.auth import HTTPBasicAuth
 
 from logexport.push import push_pb2
@@ -34,4 +34,11 @@ class LokiClient:
         if self.auth is not None:
             req.auth = self.auth
         res = requests.Session().send(req.prepare())
-        res.raise_for_status()
+        if 400 <= res.status_code < 500:
+            raise HTTPError(
+                f"{res.status_code} Client Error for url: {res.url}: {res.text}"
+            )
+        elif 500 <= res.status_code < 600:
+            raise HTTPError(
+                f"{res.status_code} Server Error for url: {res.url}: {res.text}"
+            )
