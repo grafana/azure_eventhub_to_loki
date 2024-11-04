@@ -1,4 +1,4 @@
-import urllib
+import urllib.parse
 from collections.abc import Iterable
 
 import requests
@@ -27,7 +27,7 @@ class LokiClient:
 
         req = Request(
             "POST",
-            urllib.parse.urljoin(self.endpoint, "loki/api/v1/push"),
+            urllib.parse.urljoin(self.endpoint, "/loki/api/v1/push"),
             data=push_request.SerializeToString(),
             headers={"Content-Type": "application/x-protobuf"},
         )

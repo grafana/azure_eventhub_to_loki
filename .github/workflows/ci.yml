@@ -17,7 +17,9 @@ jobs:
         pip install .[test]
         pip install .[package]
     - run: mypy function_app.py logexport
-    - run: black --exclude "logexport/_version.py" function_app.py logexport
+    - run: |
+        isort --skip "logexport/_version.py" check function_app.py logexport/*
+        black --exclude "logexport/_version.py" function_app.py logexport
     - run: EVENTHUB_NAME=test pytest .
     - name: Package
       run: make clean "logexport.$(python -m setuptools_scm).zip"

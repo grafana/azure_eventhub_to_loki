@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Final
 
 import azure.functions as func
+
 from logexport.deserialize import streams_from_event
 from logexport.loki import LokiClient
 
@@ -16,7 +17,7 @@ FUNCTION_NAME_VAR: Final[str] = "FUNCTION_NAME"
 app = func.FunctionApp()
 
 loki_client = LokiClient(
-    os.environ.get("LOKI_URL") or "",
+    os.environ["LOKI_ENDPOINT"],
     os.environ.get("LOKI_USERNAME"),
     os.environ.get("LOKI_PASSWORD"),
 )
@@ -33,7 +34,7 @@ if "EVENTHUB_NAME" not in os.environ:
     connection=EVENTHUB_CONNECTION_VAR,  # the parameter expects the env var name not the value.
     cardinality="many",
 )
-def logexport(azeventhub: Iterable[func.EventHubEvent]):
+def logexport(azeventhub):
     try:
         streams = streams_from_event((event.get_body() for event in azeventhub))
         logging.info(
