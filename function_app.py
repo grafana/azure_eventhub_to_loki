@@ -2,7 +2,7 @@ import os
 import azure.functions as func
 import logging
 from datetime import datetime
-from logexport.deserialize import StreamFromEvent
+from logexport.deserialize import stream_from_event
 from typing import Final
 
 # Constants defining environment variables names
@@ -26,7 +26,7 @@ if "EVENTHUB_NAME" not in os.environ:
 )
 def logexport(azeventhub: func.EventHubEvent):
     try:
-        stream = StreamFromEvent(azeventhub.get_body())
+        stream = stream_from_event(azeventhub.get_body())
         logging.info(
             "Python EventHub trigger processed an %d events: %s",
             len(stream.entries),

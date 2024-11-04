@@ -4,9 +4,9 @@ from logexport._version import __version__
 from logexport.push import push_pb2
 
 
-def EntryFromJson(load: dict) -> push_pb2.EntryAdapter:
+def entry_from_json(load: dict) -> push_pb2.EntryAdapter:
     entry = push_pb2.EntryAdapter()
-    entry.timestamp.FromJsonString(getTimestamp(load))
+    entry.timestamp.FromJsonString(get_timestamp(load))
 
     # TODO: decide what should be metadata
     labels = [
@@ -26,15 +26,21 @@ def EntryFromJson(load: dict) -> push_pb2.EntryAdapter:
     return entry
 
 
-def StreamFromEvent(f) -> push_pb2.StreamAdapter:
+def stream_from_event(f) -> push_pb2.StreamAdapter:
     stream = push_pb2.StreamAdapter()
 
     # TODO: decide what should be stream labels
     stream.labels = """{foo="bar"}"""
     for i in ijson.items(f, "records.item"):
-        stream.entries.append(EntryFromJson(i))
+        stream.entries.append(entry_from_json(i))
 
     return stream
 
-def getTimestamp(load: dict) -> str:
-    return load.get("timeStamp") or load.get("timestamp") or load.get("time") or load.get("created")
+
+def get_timestamp(load: dict) -> str:
+    return (
+        load.get("timeStamp")
+        or load.get("timestamp")
+        or load.get("time")
+        or load.get("created")
+    )
