@@ -2,6 +2,7 @@ import urllib.parse
 from collections.abc import Iterable
 
 import requests
+import snappy  # type: ignore
 from requests import HTTPError, Request
 from requests.auth import HTTPBasicAuth
 
@@ -25,10 +26,12 @@ class LokiClient:
         for stream in streams:
             push_request.streams.append(stream)
 
+        data: bytes = snappy.compress(push_request.SerializeToString())
+
         req = Request(
             "POST",
             urllib.parse.urljoin(self.endpoint, "/loki/api/v1/push"),
-            data=push_request.SerializeToString(),
+            data=data,
             headers={"Content-Type": "application/x-protobuf"},
         )
         if self.auth is not None:

@@ -6,6 +6,7 @@ dependencies = [
   "azure-functions==1.21.1",
   "ijson==3.3.0",
   "protobuf==5.28.3",
+  "python-snappy==0.7.3",
   "requests==2.32.3",
 ]
 description = "Azure function to send eventhub events to Grafana Loki / Grafana Cloud"

@@ -11,13 +11,6 @@ def entry_from_json(load: dict) -> push_pb2.EntryAdapter:
     entry = push_pb2.EntryAdapter()
     entry.timestamp.FromJsonString(get_timestamp(load))
 
-    # TODO: decide what should be metadata
-    labels = [
-        push_pb2.LabelPairAdapter(name=k, value=str(v))
-        for k, v in load["properties"].items()
-    ]
-    entry.structuredMetadata.extend(labels)
-
     # Add version information to the metadata
     entry.structuredMetadata.add(
         name="__grafana_azure_logexport_version__", value=__version__
@@ -32,7 +25,7 @@ def entry_from_json(load: dict) -> push_pb2.EntryAdapter:
 def stream_from_bytes(f) -> push_pb2.StreamAdapter:
     stream = push_pb2.StreamAdapter()
 
-    # TODO: decide what should be stream labels
+    # TODO: use category and type fields if present.
     stream.labels = """{job="integrations/azure-logexport"}"""
     for i in ijson.items(f, "records.item"):
         stream.entries.append(entry_from_json(i))
