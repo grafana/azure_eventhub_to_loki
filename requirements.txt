@@ -1,4 +1,0 @@
-azure-functions==1.21.1
-ijson==3.3.0
-protobuf==5.28.2
-./

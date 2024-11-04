@@ -1,24 +1,32 @@
-import json
+import os
 import azure.functions as func
-from collections.abc import Iterator
-import ijson  # type: ignore
 import logging
 from datetime import datetime
-from logexport.push import push_pb2
+from logexport.deserialize import stream_from_event
+from typing import Final
+
+# Constants defining environment variables names
+EVENTHUB_NAME_VAR: Final[str] = "EVENTHUB_NAME"
+EVENTHUB_CONNECTION_VAR: Final[str] = "EVENTHUB_CONNECTION"
+FUNCTION_NAME_VAR: Final[str] = "FUNCTION_NAME"
 
 app = func.FunctionApp()
 
+if "EVENTHUB_NAME" not in os.environ:
+    logging.error("EVENTHUB_NAME environment variable is not set")
+    exit(1)
 
-@app.function_name(name="logexport")
+
+@app.function_name(name=os.getenv(FUNCTION_NAME_VAR, default="logexport"))
 @app.event_hub_message_trigger(
-    arg_name="azeventhub",  # TODO: make this configurable
-    event_hub_name="cspazure",
-    connection="cspazure_logsexport_EVENTHUB",
+    arg_name="azeventhub",
+    event_hub_name=os.environ.get(EVENTHUB_NAME_VAR) or "",
+    connection=EVENTHUB_CONNECTION_VAR,  # the parameter expects the env var name not the value.
     cardinality="many",
 )
 def logexport(azeventhub: func.EventHubEvent):
     try:
-        stream = StreamFromEvent(azeventhub.get_body())
+        stream = stream_from_event(azeventhub.get_body())
         logging.info(
             "Python EventHub trigger processed an %d events: %s",
             len(stream.entries),
@@ -26,29 +34,3 @@ def logexport(azeventhub: func.EventHubEvent):
         )
     except Exception:
         logging.exception("failed to process event")
-
-
-def EntryFromJson(load: dict) -> push_pb2.EntryAdapter:
-    entry = push_pb2.EntryAdapter()
-    entry.timestamp.FromJsonString(load["time"])
-    # TODO: decide what should be metadata
-    labels = [
-        push_pb2.LabelPairAdapter(name=k, value=str(v))
-        for k, v in load["properties"].items()
-    ]
-    entry.structuredMetadata.extend(labels)
-    # TODO: decide what the body should be
-    entry.line = json.dumps(load)
-
-    return entry
-
-
-def StreamFromEvent(f) -> push_pb2.StreamAdapter:
-    stream = push_pb2.StreamAdapter()
-
-    # TODO: decide what should be stream labels
-    stream.labels = """{foo="bar"}"""
-    for i in ijson.items(f, "records.item"):
-        stream.entries.append(EntryFromJson(i))
-
-    return stream
