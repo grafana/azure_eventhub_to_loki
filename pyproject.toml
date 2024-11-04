@@ -6,6 +6,7 @@ dependencies = [
   "azure-functions==1.21.1",
   "ijson==3.3.0",
   "protobuf==5.28.3",
+  "requests==2.32.3",
 ]
 description = "Azure function to send eventhub events to Grafana Loki / Grafana Cloud"
 name = "logexport"
@@ -21,6 +22,7 @@ test = [
   "black==24.10.0",
   "mypy==1.11.2",
   "types-protobuf==5.28.3.20241030",
+  "types-requests==2.32.0.20241016",
   "pytest==8.3.3",
 ]
 package = [

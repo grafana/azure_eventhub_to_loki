@@ -43,5 +43,5 @@ def get_timestamp(load: dict) -> str:
         or load.get("timestamp")
         or load.get("time")
         or load.get("created")
-        or "" # TODO: decide on a default
+        or ""  # TODO: decide on a default
     )

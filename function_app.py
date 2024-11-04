@@ -3,6 +3,7 @@ import azure.functions as func
 import logging
 from datetime import datetime
 from logexport.deserialize import stream_from_event
+from logexport.loki import LokiClient
 from typing import Final
 
 # Constants defining environment variables names
@@ -11,6 +12,12 @@ EVENTHUB_CONNECTION_VAR: Final[str] = "EVENTHUB_CONNECTION"
 FUNCTION_NAME_VAR: Final[str] = "FUNCTION_NAME"
 
 app = func.FunctionApp()
+
+loki_client = LokiClient(
+    os.environ.get("LOKI_URL") or "",
+    os.environ.get("LOKI_USERNAME"),
+    os.environ.get("LOKI_PASSWORD"),
+)
 
 if "EVENTHUB_NAME" not in os.environ:
     logging.error("EVENTHUB_NAME environment variable is not set")
@@ -32,5 +39,6 @@ def logexport(azeventhub: func.EventHubEvent):
             len(stream.entries),
             stream,
         )
+        loki_client.push(stream)
     except Exception:
         logging.exception("failed to process event")
