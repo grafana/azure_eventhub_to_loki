@@ -1,11 +1,21 @@
 import json
 from dataclasses import dataclass
-from logexport.deserialize import entry_from_event_record, get_timestamp, stream_from_event_body, VERSION_LABEL_KEY
+
+from logexport.deserialize import (
+    VERSION_LABEL_KEY,
+    entry_from_event_record,
+    get_timestamp,
+    stream_from_event_body,
+)
 from logexport.push import push_pb2
 
 
 def test_deserialization_message():
-    load = {"properties": {"key": "value"}, "time": "2024-06-05T10:47:31.676Z", "resourceId": "/SUBSCRIPTIONS/1234"}
+    load = {
+        "properties": {"key": "value"},
+        "time": "2024-06-05T10:47:31.676Z",
+        "resourceId": "/SUBSCRIPTIONS/1234",
+    }
     entry = entry_from_event_record(load, 0)
     assert json.loads(entry.line) == {
         "resourceId": "/SUBSCRIPTIONS/1234",
@@ -26,18 +36,31 @@ def test_deserialization_records():
         stream = stream_from_event_body(f)
         assert len(stream.entries) == 2
 
+
 def test_deserialization_timestamp():
     @dataclass
     class TestCase:
         field: str
-        input: dict 
+        input: dict
         expected: int
 
     test_cases = [
-            TestCase("timestamp", {"timestamp": "2024-06-05T10:47:31.676Z"}, "2024-06-05T10:47:31.676Z"),
-            TestCase("timeStamp", {"timeStamp": "2024-06-05T10:47:31.676Z"},"2024-06-05T10:47:31.676Z"),
-            TestCase("time", {"time": "2024-06-05T10:47:31.676Z"},"2024-06-05T10:47:31.676Z"),
-            TestCase("created", {"time": "2024-06-05T10:47:31.676Z"}, "2024-06-05T10:47:31.676Z"),
+        TestCase(
+            "timestamp",
+            {"timestamp": "2024-06-05T10:47:31.676Z"},
+            "2024-06-05T10:47:31.676Z",
+        ),
+        TestCase(
+            "timeStamp",
+            {"timeStamp": "2024-06-05T10:47:31.676Z"},
+            "2024-06-05T10:47:31.676Z",
+        ),
+        TestCase(
+            "time", {"time": "2024-06-05T10:47:31.676Z"}, "2024-06-05T10:47:31.676Z"
+        ),
+        TestCase(
+            "created", {"time": "2024-06-05T10:47:31.676Z"}, "2024-06-05T10:47:31.676Z"
+        ),
     ]
 
     for case in test_cases:
