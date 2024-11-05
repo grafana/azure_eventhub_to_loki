@@ -1,7 +1,7 @@
 import logging
 import os
 from collections.abc import Iterable
-from typing import Final
+from typing import Final, List
 
 import azure.functions as func
 
@@ -28,17 +28,17 @@ if "EVENTHUB_NAME" not in os.environ:
 
 @app.function_name(name=os.getenv(FUNCTION_NAME_VAR, default="logexport"))
 @app.event_hub_message_trigger(
-    arg_name="azeventhub",
+    arg_name="events",
     event_hub_name=os.environ.get(EVENTHUB_NAME_VAR) or "",
     connection=EVENTHUB_CONNECTION_VAR,  # the parameter expects the env var name not the value.
     cardinality="many",
 )
-def logexport(azeventhub):
+def logexport(events: List[func.EventHubEvent]):
     try:
-        streams = streams_from_event((event.get_body() for event in azeventhub))
+        streams = streams_from_event((event.get_body() for event in events))
         logging.info(
             "Python EventHub trigger processed a %d events",
-            len(azeventhub),
+            len(events),
         )
         loki_client.push(streams)
     except Exception:
