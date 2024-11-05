@@ -5,15 +5,18 @@ from logexport.push import push_pb2
 
 
 def test_deserialization_message():
-    load = {"properties": {"key": "value"}, "time": "2024-06-05T10:47:31.676Z"}
-    entry = entry_from_event_record(load)
+    load = {"properties": {"key": "value"}, "time": "2024-06-05T10:47:31.676Z", "resourceId": "/SUBSCRIPTIONS/1234"}
+    entry = entry_from_event_record(load, 0)
     assert json.loads(entry.line) == {
+        "resourceId": "/SUBSCRIPTIONS/1234",
         "time": "2024-06-05T10:47:31.676Z",
         "properties": {"key": "value"},
     }
 
     keys = [pair.name for pair in entry.structuredMetadata]
     assert VERSION_LABEL_KEY in keys
+    assert "resourceId" in keys
+    assert "correlationId" not in keys
 
     assert entry.timestamp.ToSeconds() == 1717584451
 

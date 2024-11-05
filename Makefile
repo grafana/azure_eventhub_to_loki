@@ -10,6 +10,11 @@ lint:
 	isort --skip "logexport/_version.py" -c function_app.py logexport/*
 	black --check --exclude "logexport/_version.py" function_app.py logexport
 
+.PHONY: fmt
+fmt:
+	isort --skip "logexport/_version.py" function_app.py logexport/*
+	black --exclude "logexport/_version.py" function_app.py logexport
+
 protos: push.proto buf.gen.yaml buf.yaml
 	buf generate .
 
