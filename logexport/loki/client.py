@@ -20,6 +20,8 @@ class LokiClient:
         self.endpoint = url
         if username is not None and password is not None:
             self.auth = HTTPBasicAuth(username, password)
+        else:
+            self.auth = None
 
     def push(self, streams: Iterable[push_pb2.StreamAdapter]):
         push_request = push_pb2.PushRequest()
@@ -45,3 +47,11 @@ class LokiClient:
             raise HTTPError(
                 f"{res.status_code} Server Error for url: {res.url}: {res.text}"
             )
+
+    def query(self, query: str):
+        res = requests.get(
+            urllib.parse.urljoin(self.endpoint, "/loki/api/v1/query"),
+            params={"query": query},
+        )
+        res.raise_for_status()
+        return res.json()
