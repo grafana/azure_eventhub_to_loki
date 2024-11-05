@@ -1,9 +1,12 @@
-import os
-import azure.functions as func
 import logging
-from datetime import datetime
-from logexport.deserialize import stream_from_event
-from typing import Final
+import os
+from collections.abc import Iterable
+from typing import Final, List
+
+import azure.functions as func
+
+from logexport.deserialize import streams_from_events
+from logexport.loki import LokiClient
 
 # Constants defining environment variables names
 EVENTHUB_NAME_VAR: Final[str] = "EVENTHUB_NAME"
@@ -12,6 +15,12 @@ FUNCTION_NAME_VAR: Final[str] = "FUNCTION_NAME"
 
 app = func.FunctionApp()
 
+loki_client = LokiClient(
+    os.environ["LOKI_ENDPOINT"],
+    os.environ.get("LOKI_USERNAME"),
+    os.environ.get("LOKI_PASSWORD"),
+)
+
 if "EVENTHUB_NAME" not in os.environ:
     logging.error("EVENTHUB_NAME environment variable is not set")
     exit(1)
@@ -19,18 +28,18 @@ if "EVENTHUB_NAME" not in os.environ:
 
 @app.function_name(name=os.getenv(FUNCTION_NAME_VAR, default="logexport"))
 @app.event_hub_message_trigger(
-    arg_name="azeventhub",
+    arg_name="events",
     event_hub_name=os.environ.get(EVENTHUB_NAME_VAR) or "",
     connection=EVENTHUB_CONNECTION_VAR,  # the parameter expects the env var name not the value.
     cardinality="many",
 )
-def logexport(azeventhub: func.EventHubEvent):
+def logexport(events: List[func.EventHubEvent]):
     try:
-        stream = stream_from_event(azeventhub.get_body())
+        streams = streams_from_events((event.get_body() for event in events))
         logging.info(
-            "Python EventHub trigger processed an %d events: %s",
-            len(stream.entries),
-            stream,
+            "Python EventHub trigger processed a %d events",
+            len(events),
         )
+        loki_client.push(streams)
     except Exception:
         logging.exception("failed to process event")

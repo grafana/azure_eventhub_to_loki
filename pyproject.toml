@@ -6,6 +6,8 @@ dependencies = [
   "azure-functions==1.21.1",
   "ijson==3.3.0",
   "protobuf==5.28.3",
+  "python-snappy==0.7.3",
+  "requests==2.32.3",
 ]
 description = "Azure function to send eventhub events to Grafana Loki / Grafana Cloud"
 name = "logexport"
@@ -19,13 +21,18 @@ requires = ["setuptools>=64", "setuptools-scm>=8"]
 [project.optional-dependencies]
 test = [
   "black==24.10.0",
+  "isort==5.13.2",
   "mypy==1.11.2",
-  "types-protobuf==5.28.3.20241030",
   "pytest==8.3.3",
+  "types-protobuf==5.28.3.20241030",
+  "types-requests==2.32.0.20241016",
 ]
 package = [
   "setuptools_scm>=8",
 ]
+
+[tool.isort]
+profile = "black"
 
 [tool.pytest.ini_options]
 pythonpath = [

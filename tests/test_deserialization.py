@@ -1,23 +1,29 @@
 import json
 from dataclasses import dataclass
-from logexport.deserialize import entry_from_json, get_timestamp, stream_from_event
+from logexport.deserialize import entry_from_event_record, get_timestamp, stream_from_event_body, VERSION_LABEL_KEY
 from logexport.push import push_pb2
 
 
 def test_deserialization_message():
-    load = {"properties": {"key": "value"}, "time": "2024-06-05T10:47:31.676Z"}
-    entry = entry_from_json(load)
+    load = {"properties": {"key": "value"}, "time": "2024-06-05T10:47:31.676Z", "resourceId": "/SUBSCRIPTIONS/1234"}
+    entry = entry_from_event_record(load, 0)
     assert json.loads(entry.line) == {
+        "resourceId": "/SUBSCRIPTIONS/1234",
         "time": "2024-06-05T10:47:31.676Z",
         "properties": {"key": "value"},
     }
-    assert push_pb2.LabelPairAdapter(name="key", value="value") in entry.structuredMetadata
+
+    keys = [pair.name for pair in entry.structuredMetadata]
+    assert VERSION_LABEL_KEY in keys
+    assert "resourceId" in keys
+    assert "correlationId" not in keys
+
     assert entry.timestamp.ToSeconds() == 1717584451
 
 
 def test_deserialization_records():
     with open("tests/record_sample.json", "rb") as f:
-        stream = stream_from_event(f)
+        stream = stream_from_event_body(f)
         assert len(stream.entries) == 2
 
 def test_deserialization_timestamp():
