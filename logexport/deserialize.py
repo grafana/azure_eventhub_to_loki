@@ -10,7 +10,7 @@ from logexport.push import push_pb2
 VERSION_LABEL_KEY: Final[str] = "__grafana_azure_logexport_version__"
 
 
-def entry_from_json(load: dict) -> push_pb2.EntryAdapter:
+def entry_from_event_record(load: dict) -> push_pb2.EntryAdapter:
     entry = push_pb2.EntryAdapter()
     entry.timestamp.FromJsonString(get_timestamp(load))
 
@@ -23,20 +23,20 @@ def entry_from_json(load: dict) -> push_pb2.EntryAdapter:
     return entry
 
 
-def stream_from_bytes(f) -> push_pb2.StreamAdapter:
+def stream_from_event_body(f) -> push_pb2.StreamAdapter:
     stream = push_pb2.StreamAdapter()
 
     # TODO: use category and type fields if present.
     stream.labels = """{job="integrations/azure-logexport"}"""
     for i in ijson.items(f, "records.item"):
-        stream.entries.append(entry_from_json(i))
+        stream.entries.append(entry_from_event_record(i))
 
     return stream
 
 
-def streams_from_event(events: Iterable[bytes]) -> Iterable[push_pb2.StreamAdapter]:
+def streams_from_events(events: Iterable[bytes]) -> Iterable[push_pb2.StreamAdapter]:
     for event in events:
-        yield stream_from_bytes(event)
+        yield stream_from_event_body(event)
 
 
 def get_timestamp(load: dict) -> str:
