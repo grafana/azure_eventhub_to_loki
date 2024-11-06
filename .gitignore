@@ -136,3 +136,4 @@ __azurite_db*__.json
 
 # Artifacts
 logexport*.zip
+logexport/_version.py
