@@ -5,6 +5,9 @@ An Azure function that consume eventhub messages and ships them to Grafana Loki 
 - `EVENTHUB_NAME`: The name of the EventHub to consume from.
 - `EVENTHUB_CONNECTION`: The connection string for the EventHub.
 - `FUNCTION_NAME`: The name of the Azure Function; defaults to `logexport`.
+- `LOKI_ENDPOINT`: The root URL of the Loki instance to send logs to.
+- `LOKI_USERNAME`: The optional username to use for authentication with Loki.
+- `LOKI_PASSWORD`: The optional password to use for authentication with Loki.
 
 ## Release
 
@@ -15,4 +18,10 @@ Once built the package can deployed to Azure using the Azure CLI:
 
 ```bash
 az functionapp deployment source config-zip -g <resource-group> -n <function-app-name> --src <path-to-zip-file>
+```
+
+Changes to `logexport/_version.py` have been ignored with
+
+```bash
+git update-index --skip-worktree logexport/_version.py
 ```

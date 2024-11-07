@@ -67,7 +67,7 @@
             "ResourceGroup": "rg-anonymized"
         },
         {
-            "PartitionId": "0",
+            "PartitionId": "1",
             "originalEventTimestamp": "2024-06-05T10:47:32.4655379Z",
             "time": "2024-06-05T10:47:32.4736860Z",
             "resourceId": "/SUBSCRIPTIONS/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/RESOURCEGROUPS/RG-ANONYMIZED/PROVIDERS/MICROSOFT.SQL/SERVERS/SQL-ANONYMIZED/DATABASES/MASTER",
@@ -127,6 +127,19 @@
                 "is_server_level_audit": "true",
                 "event_id": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
             },
+            "location": "westeurope",
+            "LogicalServerName": "sql-anonymized",
+            "SubscriptionId": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
+            "ResourceGroup": "rg-anonymized"
+        },
+        {
+            "PartitionId": "1",
+            "originalEventTimestamp": "2024-06-05T10:47:32.4655379Z",
+            "time": "2024-06-05T10:47:32.4736860Z",
+            "resourceId": "/SUBSCRIPTIONS/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/RESOURCEGROUPS/RG-ANONYMIZED/PROVIDERS/MICROSOFT.SQL/SERVERS/SQL-ANONYMIZED/DATABASES/MASTER",
+            "category": "SQLSecurityAuditEvents",
+            "type": "AuditEvent",
+            "operationName": "AuditEvent",
             "location": "westeurope",
             "LogicalServerName": "sql-anonymized",
             "SubscriptionId": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",

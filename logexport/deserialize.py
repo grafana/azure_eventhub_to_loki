@@ -1,7 +1,7 @@
 import json
 import time
 from collections.abc import Iterable
-from typing import Final
+from typing import Final, Tuple
 
 import ijson  # type: ignore
 
@@ -11,7 +11,10 @@ from logexport.push import push_pb2
 VERSION_LABEL_KEY: Final[str] = "__grafana_azure_logexport_version__"
 
 
-def entry_from_event_record(load: dict, current_ts_nanos: int) -> push_pb2.EntryAdapter:
+def entry_from_event_record(
+    load: dict, current_ts_nanos: int
+) -> Tuple[str | None, str | None, push_pb2.EntryAdapter]:
+    """Returns the category and type of the event and the entry."""
     entry = push_pb2.EntryAdapter()
 
     ts = get_timestamp(load)
@@ -20,7 +23,6 @@ def entry_from_event_record(load: dict, current_ts_nanos: int) -> push_pb2.Entry
     else:
         entry.timestamp.FromNanoseconds(current_ts_nanos)
 
-    # Add version information to the metadata
     entry.structuredMetadata.add(name=VERSION_LABEL_KEY, value=__version__)
 
     if "resourceId" in load:
@@ -32,28 +34,33 @@ def entry_from_event_record(load: dict, current_ts_nanos: int) -> push_pb2.Entry
     # TODO: decide what the body should be
     entry.line = json.dumps(load)
 
-    return entry
+    return load.get("category"), load.get("type"), entry
 
 
-def stream_from_event_body(f) -> push_pb2.StreamAdapter:
-    stream = push_pb2.StreamAdapter()
+def stream_from_event_body(f) -> Iterable[push_pb2.StreamAdapter]:
+    """Deserializes a single event body into a list of streams.
+    Each stream has the job label and category and type labels if present.
+    """
 
-    # TODO: use category and type fields if present.
-    stream.labels = """{job="integrations/azure-logexport"}"""
+    stream_index: dict[str, push_pb2.StreamAdapter] = {}
     current_ts = time.time_ns()
     for i in ijson.items(f, "records.item"):
 
         # Each record should receive it's own unique timestamp.
         current_ts += 1
 
-        stream.entries.append(entry_from_event_record(i, current_ts))
+        (category, type, entry) = entry_from_event_record(i, current_ts)
+        labels = create_labels_string(category, type)
+        stream = stream_index.setdefault(labels, push_pb2.StreamAdapter(labels=labels))
+        stream.entries.append(entry)
 
-    return stream
+    return stream_index.values()
 
 
 def streams_from_events(events: Iterable[bytes]) -> Iterable[push_pb2.StreamAdapter]:
     for event in events:
-        yield stream_from_event_body(event)
+        for stream in stream_from_event_body(event):
+            yield stream
 
 
 def get_timestamp(load: dict) -> str | None:
@@ -63,3 +70,13 @@ def get_timestamp(load: dict) -> str | None:
         or load.get("time")
         or load.get("created")
     )
+
+
+def create_labels_string(category: str | None, type: str | None) -> str:
+    labels = 'job="integrations/azure-logexport"'
+    if category is not None:
+        labels += f',category="{category}"'
+    if type is not None:
+        labels += f',type="{type}"'
+
+    return "{" + labels + "}"

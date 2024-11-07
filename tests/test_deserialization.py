@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 from logexport.deserialize import (
     VERSION_LABEL_KEY,
+    create_labels_string,
     entry_from_event_record,
     get_timestamp,
     stream_from_event_body,
@@ -15,9 +16,13 @@ def test_deserialization_message():
         "properties": {"key": "value"},
         "time": "2024-06-05T10:47:31.676Z",
         "resourceId": "/SUBSCRIPTIONS/1234",
+        "category": "cat1",
     }
-    entry = entry_from_event_record(load, 0)
+    (cat, _, entry) = entry_from_event_record(load, 0)
+
+    assert cat == "cat1"
     assert json.loads(entry.line) == {
+        "category": "cat1",
         "resourceId": "/SUBSCRIPTIONS/1234",
         "time": "2024-06-05T10:47:31.676Z",
         "properties": {"key": "value"},
@@ -33,8 +38,18 @@ def test_deserialization_message():
 
 def test_deserialization_records():
     with open("tests/record_sample.json", "rb") as f:
-        stream = stream_from_event_body(f)
-        assert len(stream.entries) == 2
+        streams = list(stream_from_event_body(f))
+        assert len(streams) == 2
+        assert len(streams[0].entries) == 2
+        assert (
+            streams[0].labels
+            == """{job="integrations/azure-logexport",category="SQLSecurityAuditEvents"}"""
+        )
+        assert len(streams[1].entries) == 1
+        assert (
+            streams[1].labels
+            == """{job="integrations/azure-logexport",category="SQLSecurityAuditEvents",type="AuditEvent"}"""
+        )
 
 
 def test_deserialization_timestamp():
@@ -66,3 +81,19 @@ def test_deserialization_timestamp():
     for case in test_cases:
         ts = get_timestamp(case.input)
         assert ts == case.expected
+
+
+def test_create_labels_string():
+    assert create_labels_string(None, None) == '{job="integrations/azure-logexport"}'
+    assert (
+        create_labels_string("cat1", "type1")
+        == '{job="integrations/azure-logexport",category="cat1",type="type1"}'
+    )
+    assert (
+        create_labels_string(None, "type1")
+        == '{job="integrations/azure-logexport",type="type1"}'
+    )
+    assert (
+        create_labels_string("cat1", None)
+        == '{job="integrations/azure-logexport",category="cat1"}'
+    )
