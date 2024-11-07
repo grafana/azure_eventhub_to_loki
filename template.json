@@ -1,0 +1,196 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "projectName": {
+            "type": "string",
+            "defaultValue": "logevents",
+            "metadata": {
+                "description": "Specifies a project name that is used to generate the Event Hub name and the Namespace name."
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Specifies the Azure location for all resources."
+            }
+        },
+        "lokiEndpoint": {
+            "type": "string",
+            "metadata": {
+                "description": "The root URL of the Loki instance to send logs to."
+            }
+        },
+        "lokiUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "The optional username to use for authentication with Loki."
+            }
+        },
+        "lokiPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The optional password to use for authentication with Loki."
+            }
+        },
+        "eventHubSku": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "allowedValues": [
+                "Basic",
+                "Standard"
+            ],
+            "metadata": {
+                "description": "Specifies the messaging tier for Event Hub Namespace."
+            }
+        },
+        "storageSku": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "metadata": {
+                "description": "Storage account SKU name."
+            }
+        },
+        "variables": {
+            "eventHubNamespaceName": "[format('{0}-ns', parameters('projectName'))]",
+            "eventHubName": "[parameters('projectName')]",
+            "storageAccountName": "[format('{0}-fnstr', parameters('projectName'))]"
+        },
+        "resources": [
+            {
+                "type": "Microsoft.EventHub/namespaces",
+                "apiVersion": "2021-11-01",
+                "name": "[variables('eventHubNamespaceName')]",
+                "location": "[parameters('location')]",
+                "sku": {
+                    "name": "[parameters('eventHubSku')]",
+                    "tier": "[parameters('eventHubSku')]",
+                    "capacity": 1
+                },
+                "properties": {
+                    "isAutoInflateEnabled": false,
+                    "maximumThroughputUnits": 0
+                }
+            },
+            {
+                "type": "Microsoft.EventHub/namespaces/eventhubs",
+                "apiVersion": "2021-11-01",
+                "name": "[format('{0}/{1}', variables('eventHubNamespaceName'), variables('eventHubName'))]",
+                "properties": {
+                    "messageRetentionInDays": 7,
+                    "partitionCount": 1,
+                    "messageTimestampDescription": {
+                        "timestampType": "LogAppend"
+                    }
+                },
+                "dependsOn": [
+                    "[resourceId('Microsoft.EventHub/namespaces', variables('eventHubNamespaceName'))]"
+                ]
+            },
+            {
+                "type": "Microsoft.EventHub/namespaces/authorizationrules",
+                "apiVersion": "2024-05-01-preview",
+                "name": "[format('{0}/{1}', variables('eventHubNamespaceName'), parameters('projectName'))]",
+                "location": "[parameters('location')]",
+                "dependsOn": [
+                    "[resourceId('Microsoft.EventHub/namespaces', parameters('logevents_namespace'))]"
+                ],
+                "properties": {
+                    "rights": [
+                        "Listen"
+                    ]
+                }
+            },
+            {
+                "type": "Microsoft.Storage/storageAccounts",
+                "apiVersion": "2021-04-01",
+                "name": "[variables('storageAccountName')]",
+                "location": "[parameters('location')]",
+                "sku": {
+                    "name": "[parameters('storageSku')]"
+                },
+                "kind": "StorageV2",
+                "properties": {
+                    "supportsHttpsTrafficOnly": true,
+                    "encryption": {
+                        "services": {
+                            "file": {
+                                "keyType": "Account",
+                                "enabled": true
+                            },
+                            "blob": {
+                                "keyType": "Account",
+                                "enabled": true
+                            }
+                        },
+                        "keySource": "Microsoft.Storage"
+                    },
+                    "accessTier": "Hot"
+                }
+            },
+            {
+                "type": "Microsoft.Web/sites",
+                "apiVersion": "2020-12-01",
+                "name": "[variables('functionAppName')]",
+                "location": "[parameters('location')]",
+                "kind": "functionapp",
+                "properties": {
+                    "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+                    "siteConfig": {
+                        "appSettings": [
+                            {
+                                "name": "AzureWebJobsStorage",
+                                "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', variables('storageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2021-04-01').keys[0].value)]"
+                            },
+                            {
+                                "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                                "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', variables('storageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2021-04-01').keys[0].value)]"
+                            },
+                            {
+                                "name": "FUNCTIONS_WORKER_RUNTIME",
+                                "value": "python"
+                            },
+                            {
+                                "name": "FUNCTIONS_EXTENSION_VERSION",
+                                "value": "~4"
+                            },
+                            {
+                                "name": "WEBSITE_RUN_FROM_PACKAGE",
+                                "values": "1"
+                            },
+                            {
+                                "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+                                "value": "false"
+                            },
+                            {
+                                "name": "EVENTHUB_NAME",
+                                "value": "[variables('eventHubName')]"
+                            },
+                            {
+                                "name": "EVENTHUB_CONNECTION",
+                                "value": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationRules', variables('eventHubNamespaceName'), variables('eventHubName'), parameters('projectName')), '2021-11-01').primaryConnectionString]"
+                            },
+                            {
+                                "name": "LOKI_ENDPOINT",
+                                "value": "[parameters('lokiEndpoint')]"
+                            },
+                            {
+                                "name": "LOKI_USERNAME",
+                                "value": "[parameters('lokiUsername')]"
+                            },
+                            {
+                                "name": "LOKI_PASSWORD",
+                                "value": "[parameters('lokiPassword')]"
+                            }
+                        ]
+                    },
+                    "httpsOnly": true
+                },
+                "dependsOn": [
+                    "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+                ]
+            }
+        ]
+    }
+}
