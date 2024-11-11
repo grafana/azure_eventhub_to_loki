@@ -52,145 +52,197 @@
                 "description": "Storage account SKU name."
             }
         },
-        "variables": {
-            "eventHubNamespaceName": "[format('{0}-ns', parameters('projectName'))]",
-            "eventHubName": "[parameters('projectName')]",
-            "storageAccountName": "[format('{0}-fnstr', parameters('projectName'))]"
+        "functionAppPlanSku": {
+            "type": "string",
+            "defaultValue": "EP1",
+            "allowedValues": [
+                "EP1",
+                "EP2",
+                "EP3"
+            ],
+            "metadata": {
+                "description": "Specifies the Azure Function hosting plan SKU."
+            }
         },
-        "resources": [
-            {
-                "type": "Microsoft.EventHub/namespaces",
-                "apiVersion": "2021-11-01",
-                "name": "[variables('eventHubNamespaceName')]",
-                "location": "[parameters('location')]",
-                "sku": {
-                    "name": "[parameters('eventHubSku')]",
-                    "tier": "[parameters('eventHubSku')]",
-                    "capacity": 1
-                },
-                "properties": {
-                    "isAutoInflateEnabled": false,
-                    "maximumThroughputUnits": 0
+        "packageUri": {
+            "type": "string",
+            "metadata": {
+                "description": "The zip content url."
+            }
+        }
+    },
+    "variables": {
+        "appServicePlanName": "[format('{0}-asp', parameters('projectName'))]",
+        "eventHubNamespaceName": "[format('{0}-ns', parameters('projectName'))]",
+        "eventHubName": "[parameters('projectName')]",
+        "eventHubAuthorizationRuleName": "[format('{0}/{1}', variables('eventHubNamespaceName'), parameters('projectName'))]",
+        "functionAppName": "[format('{0}-fn', parameters('projectName'))]",
+        "storageAccountName": "[format('{0}fnstr', parameters('projectName'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.EventHub/namespaces",
+            "apiVersion": "2021-11-01",
+            "name": "[variables('eventHubNamespaceName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "[parameters('eventHubSku')]",
+                "tier": "[parameters('eventHubSku')]",
+                "capacity": 1
+            },
+            "properties": {
+                "isAutoInflateEnabled": false,
+                "maximumThroughputUnits": 0
+            }
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs",
+            "apiVersion": "2021-11-01",
+            "name": "[format('{0}/{1}', variables('eventHubNamespaceName'), variables('eventHubName'))]",
+            "properties": {
+                "messageRetentionInDays": 7,
+                "partitionCount": 1,
+                "messageTimestampDescription": {
+                    "timestampType": "LogAppend"
                 }
             },
-            {
-                "type": "Microsoft.EventHub/namespaces/eventhubs",
-                "apiVersion": "2021-11-01",
-                "name": "[format('{0}/{1}', variables('eventHubNamespaceName'), variables('eventHubName'))]",
-                "properties": {
-                    "messageRetentionInDays": 7,
-                    "partitionCount": 1,
-                    "messageTimestampDescription": {
-                        "timestampType": "LogAppend"
-                    }
-                },
-                "dependsOn": [
-                    "[resourceId('Microsoft.EventHub/namespaces', variables('eventHubNamespaceName'))]"
-                ]
-            },
-            {
-                "type": "Microsoft.EventHub/namespaces/authorizationrules",
-                "apiVersion": "2024-05-01-preview",
-                "name": "[format('{0}/{1}', variables('eventHubNamespaceName'), parameters('projectName'))]",
-                "location": "[parameters('location')]",
-                "dependsOn": [
-                    "[resourceId('Microsoft.EventHub/namespaces', parameters('logevents_namespace'))]"
-                ],
-                "properties": {
-                    "rights": [
-                        "Listen"
-                    ]
-                }
-            },
-            {
-                "type": "Microsoft.Storage/storageAccounts",
-                "apiVersion": "2021-04-01",
-                "name": "[variables('storageAccountName')]",
-                "location": "[parameters('location')]",
-                "sku": {
-                    "name": "[parameters('storageSku')]"
-                },
-                "kind": "StorageV2",
-                "properties": {
-                    "supportsHttpsTrafficOnly": true,
-                    "encryption": {
-                        "services": {
-                            "file": {
-                                "keyType": "Account",
-                                "enabled": true
-                            },
-                            "blob": {
-                                "keyType": "Account",
-                                "enabled": true
-                            }
-                        },
-                        "keySource": "Microsoft.Storage"
-                    },
-                    "accessTier": "Hot"
-                }
-            },
-            {
-                "type": "Microsoft.Web/sites",
-                "apiVersion": "2020-12-01",
-                "name": "[variables('functionAppName')]",
-                "location": "[parameters('location')]",
-                "kind": "functionapp",
-                "properties": {
-                    "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
-                    "siteConfig": {
-                        "appSettings": [
-                            {
-                                "name": "AzureWebJobsStorage",
-                                "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', variables('storageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2021-04-01').keys[0].value)]"
-                            },
-                            {
-                                "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                                "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', variables('storageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2021-04-01').keys[0].value)]"
-                            },
-                            {
-                                "name": "FUNCTIONS_WORKER_RUNTIME",
-                                "value": "python"
-                            },
-                            {
-                                "name": "FUNCTIONS_EXTENSION_VERSION",
-                                "value": "~4"
-                            },
-                            {
-                                "name": "WEBSITE_RUN_FROM_PACKAGE",
-                                "values": "1"
-                            },
-                            {
-                                "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
-                                "value": "false"
-                            },
-                            {
-                                "name": "EVENTHUB_NAME",
-                                "value": "[variables('eventHubName')]"
-                            },
-                            {
-                                "name": "EVENTHUB_CONNECTION",
-                                "value": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationRules', variables('eventHubNamespaceName'), variables('eventHubName'), parameters('projectName')), '2021-11-01').primaryConnectionString]"
-                            },
-                            {
-                                "name": "LOKI_ENDPOINT",
-                                "value": "[parameters('lokiEndpoint')]"
-                            },
-                            {
-                                "name": "LOKI_USERNAME",
-                                "value": "[parameters('lokiUsername')]"
-                            },
-                            {
-                                "name": "LOKI_PASSWORD",
-                                "value": "[parameters('lokiPassword')]"
-                            }
-                        ]
-                    },
-                    "httpsOnly": true
-                },
-                "dependsOn": [
-                    "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', variables('eventHubNamespaceName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/authorizationrules",
+            "apiVersion": "2024-05-01-preview",
+            "name": "[variables('eventHubAuthorizationRuleName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', variables('eventHubNamespaceName'))]"
+            ],
+            "properties": {
+                "rights": [
+                    "Listen"
                 ]
             }
-        ]
-    }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2021-04-01",
+            "name": "[variables('storageAccountName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "[parameters('storageSku')]"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "supportsHttpsTrafficOnly": true,
+                "encryption": {
+                    "services": {
+                        "file": {
+                            "keyType": "Account",
+                            "enabled": true
+                        },
+                        "blob": {
+                            "keyType": "Account",
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                },
+                "accessTier": "Hot"
+            }
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2022-03-01",
+            "name": "[variables('appServicePlanName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "tier": "ElasticPremium",
+                "name": "[parameters('functionAppPlanSku')]",
+                "family": "EP"
+            },
+            "properties": {
+                "maximumElasticWorkerCount": 20,
+                "reserved": true
+            },
+            "kind": "elastic"
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2020-12-01",
+            "name": "[variables('functionAppName')]",
+            "location": "[parameters('location')]",
+            "kind": "functionapp,linux",
+            "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+                "isReserved": true,
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', variables('storageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2021-04-01').keys[0].value)]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', variables('storageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2021-04-01').keys[0].value)]"
+                        },
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "python"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~4"
+                        },
+                        {
+                            "name": "WEBSITE_RUN_FROM_PACKAGE",
+                            "values": "1"
+                        },
+                        {
+                            "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+                            "value": "false"
+                        },
+                        {
+                            "name": "EVENTHUB_NAME",
+                            "value": "[variables('eventHubName')]"
+                        },
+                        {
+                            "name": "EVENTHUB_CONNECTION",
+                            "value": "TODO"
+                        },
+                        {
+                            "name": "LOKI_ENDPOINT",
+                            "value": "[parameters('lokiEndpoint')]"
+                        },
+                        {
+                            "name": "LOKI_USERNAME",
+                            "value": "[parameters('lokiUsername')]"
+                        },
+                        {
+                            "name": "LOKI_PASSWORD",
+                            "value": "[parameters('lokiPassword')]"
+                        }
+                    ]
+                },
+                "httpsOnly": true,
+                "numberOfWorkers": 1,
+                "linuxFxVersion": "Python|3.11"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/extensions",
+            "apiVersion": "2022-03-01",
+            "name": "[format('{0}/{1}', variables('functionAppName'), 'zipdeploy')]",
+            "properties": {
+                "packageUri": "[parameters('packageUri')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
+            ]
+        }
+    ]
 }
