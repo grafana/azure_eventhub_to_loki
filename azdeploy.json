@@ -13,7 +13,7 @@
       "type": "string",
       "defaultValue": "[format('func-{0}', uniqueString(resourceGroup().id))]",
       "metadata": {
-        "description": "The name of the Azure Function app."
+        "description": "Specifies a project name that is used to generate the Event Hub name and the Namespace name."
       }
     },
     "storageAccountType": {
@@ -59,13 +59,30 @@
       "metadata": {
         "description": "The zip content url."
       }
+    },
+    "lokiEndpoint": {
+      "type": "string",
+      "metadata": {
+        "description": "The root URL of the Loki instance to send logs to."
+      }
+    },
+    "lokiUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "The optional username to use for authentication with Loki."
+      }
+    },
+    "lokiPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The optional password to use for authentication with Loki."
+      }
     }
   },
   "variables": {
     "hostingPlanName": "[parameters('functionAppName')]",
     "applicationInsightsName": "[parameters('functionAppName')]",
-    "storageAccountName": "[format('{0}azfunctions', uniqueString(resourceGroup().id))]",
-    "isReserved": "[true()]"
+    "storageAccountName": "[format('{0}azfunctions', uniqueString(resourceGroup().id))]"
   },
   "resources": [
     {
@@ -90,7 +107,7 @@
       },
       "properties": {
         "maximumElasticWorkerCount": 20,
-        "reserved": "[variables('isReserved')]"
+        "reserved": true 
       },
       "kind": "elastic"
     },
@@ -112,9 +129,9 @@
       "apiVersion": "2022-03-01",
       "name": "[parameters('functionAppName')]",
       "location": "[parameters('location')]",
-      "kind": "[if(variables('isReserved'), 'functionapp,linux', 'functionapp')]",
+      "kind": "functionapp,linux",
       "properties": {
-        "reserved": "[variables('isReserved')]",
+        "reserved": true,
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
         "siteConfig": {
           "linuxFxVersion": "python|3.11",
@@ -150,6 +167,26 @@
             {
               "name": "WEBSITE_RUN_FROM_PACKAGE",
               "value": "1"
+            },
+            {
+              "name": "LOKI_ENDPOINT",
+              "value": "[parameters('lokiEndpoint')]"
+            },
+            {
+              "name": "LOKI_USERNAME",
+              "value": "[parameters('lokiUsername')]"
+            },
+            {
+              "name": "LOKI_PASSWORD",
+              "value": "[parameters('lokiPassword')]"
+            },
+            {
+              "name": "EVENTHUB_NAME",
+              "value": "TODO"
+            },
+            {
+              "name": "EVENTHUB_CONNECTION",
+              "value": "TODO"
             }
           ]
         }
