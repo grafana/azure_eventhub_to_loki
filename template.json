@@ -72,6 +72,7 @@
         }
     },
     "variables": {
+        "applicationInsightsName": "[variables('functionAppName')]",
         "appServicePlanName": "[format('{0}-asp', parameters('projectName'))]",
         "eventHubNamespaceName": "[format('{0}-ns', parameters('projectName'))]",
         "eventHubName": "[parameters('projectName')]",
@@ -152,6 +153,19 @@
             }
         },
         {
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2020-02-02",
+            "name": "[variables('applicationInsightsName')]",
+            "location": "[parameters('location')]",
+            "tags": {
+                "[format('hidden-link:{0}', resourceId('Microsoft.Web/sites', variables('applicationInsightsName')))]": "Resource"
+            },
+            "properties": {
+                "Application_Type": "web"
+            },
+            "kind": "web"
+        },
+        {
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2022-03-01",
             "name": "[variables('appServicePlanName')]",
@@ -229,6 +243,7 @@
                 "linuxFxVersion": "Python|3.11"
             },
             "dependsOn": [
+                "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]",
                 "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
             ]
