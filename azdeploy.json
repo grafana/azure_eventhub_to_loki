@@ -252,13 +252,14 @@
             },
             {
               "name": "EVENTHUB_CONNECTION",
-              "value": "TODO"
+              "value": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationRules', variables('eventHubNamespaceName'), variables('eventHubName'), variables('eventHubAuthorizationRuleName')),'2015-08-01').primaryConnectionString]"
             }
           ]
         }
       },
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs/', variables('eventHubNamespaceName'), variables('eventHubName'))]",
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationRules', variables('eventHubNamespaceName'), variables('eventHubName'), variables('eventHubAuthorizationRuleName'))]",
         "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
         "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
