@@ -276,5 +276,11 @@
         "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
       ]
     }
-  ]
+  ],
+  "outputs": {
+    "eventHub": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.EventHub/namespaces/eventhubs/', variables('eventHubNamespaceName'), variables('eventHubName'))]"
+    }
+  }
 }
