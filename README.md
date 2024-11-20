@@ -1,5 +1,7 @@
 An Azure function that consume eventhub messages and ships them to Grafana Loki / Grafana Cloud. 
 
+The function consumes resource and activity log messages from an Azure EventHub and ships them to a Grafana Loki instance.
+
 ## Installation
 
 The repository comes with an [Azure ARM template](https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/overview)
