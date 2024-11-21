@@ -1,5 +1,50 @@
 An Azure function that consume eventhub messages and ships them to Grafana Loki / Grafana Cloud. 
 
+The function consumes resource and activity log messages from an Azure EventHub and ships them to a Grafana Loki instance.
+
+## Installation
+
+The repository comes with an [Azure ARM template](https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/overview)
+that can be used to deploy the function to an existing Azure resource group:
+
+```bash
+az group deployment create -g <resource-group> -n <deployment-name> --template-file azdeploy.json \
+  --parameters packageUri=https://github.com/grafana/azure_eventhub_to_loki/releases/download/<version>/logexport.<version>.zip
+```
+
+This command will ask for the Loki endpoint and username/password.
+
+The template can be consumed from Terraform:
+
+```terraform
+resource "azurerm_resource_group" "logexport" {
+  name     = "logexport-group"
+  location = var.location
+}
+
+resource "azurerm_resource_group_template_deployment" "logexport" {
+  name                = "${azurerm_resource_group.logexport.name}-deploy"
+  resource_group_name = azurerm_resource_group.logexport.name
+  deployment_mode     = "Complete"
+  template_content    = file("azdeploy.json")
+
+  parameters_content = jsonencode({
+    "lokiEndpoint" = {
+      value = var.loki_endpoint
+    }
+    "lokiUsername" = {
+      value = var.loki_username
+    }
+    "lokiPassword" = {
+      value = var.loki_password
+    }
+    "packageUri" = {
+      value = var.package_uri
+    }
+  })
+}
+```
+
 ## Configuration
 
 - `EVENTHUB_NAME`: The name of the EventHub to consume from.
