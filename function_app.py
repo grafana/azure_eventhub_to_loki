@@ -38,7 +38,7 @@ if "EVENTHUB_NAME" not in os.environ:
 # and then progress in that partition is restarted.
 @app.retry(
     strategy="exponential_backoff",
-    max_retry_count=10,
+    max_retry_count="10",
     minimum_interval="00:00:01", # format followed is HH:mm:ss
     maximum_interval="00:00:07",
 )
