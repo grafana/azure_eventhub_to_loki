@@ -37,13 +37,16 @@ if "EVENTHUB_NAME" not in os.environ:
     connection=EVENTHUB_CONNECTION_VAR,  # the parameter expects the env var name not the value.
     cardinality="many",
 )
+# Configures an exponential backoff retry strategy in the trigger from eventhub to the function.
+# When eventuhb executes the function, it will not commit a checkpoint until all retries are exhausted,
+# and then progress in that partition is restarted.
 @app.retry(
     strategy="exponential_backoff",
     max_retry_count=MAX_RETRY_COUNT,
     minimum_interval=MINIMUM_INTERVAL,
     maximum_interval=MAXIMUM_INTERVAL,
 )
-def logexport(events: List[func.EventHubEvent], context: func.Context):
+def logexport(events: List[func.EventHubEvent], context: func.Context) -> None:
     try:
         streams = streams_from_events((event.get_body() for event in events))
         logging.info(
