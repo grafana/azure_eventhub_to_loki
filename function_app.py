@@ -13,6 +13,10 @@ EVENTHUB_NAME_VAR: Final[str] = "EVENTHUB_NAME"
 EVENTHUB_CONNECTION_VAR: Final[str] = "EVENTHUB_CONNECTION"
 FUNCTION_NAME_VAR: Final[str] = "FUNCTION_NAME"
 
+MAX_RETRY_COUNT: Final[str] = "3"
+MINIMUM_INTERVAL: Final[str] = "00:00:01"
+MAXIMUM_INTERVAL: Final[str] = "00:00:10"
+
 app = func.FunctionApp()
 
 loki_client = LokiClient(
@@ -33,7 +37,16 @@ if "EVENTHUB_NAME" not in os.environ:
     connection=EVENTHUB_CONNECTION_VAR,  # the parameter expects the env var name not the value.
     cardinality="many",
 )
-def logexport(events: List[func.EventHubEvent]):
+# Configures an exponential backoff retry strategy in the trigger from eventhub to the function.
+# When eventuhb executes the function, it will not commit a checkpoint until all retries are exhausted,
+# and then progress in that partition is restarted.
+@app.retry(
+    strategy="exponential_backoff",
+    max_retry_count=MAX_RETRY_COUNT,
+    minimum_interval=MINIMUM_INTERVAL,
+    maximum_interval=MAXIMUM_INTERVAL,
+)
+def logexport(events: List[func.EventHubEvent], context: func.Context) -> None:
     try:
         streams = streams_from_events((event.get_body() for event in events))
         logging.info(
@@ -42,4 +55,14 @@ def logexport(events: List[func.EventHubEvent]):
         )
         loki_client.push(streams)
     except Exception:
-        logging.exception("failed to process event")
+        if context.retry_context.retry_count == context.retry_context.max_retry_count:
+            logging.exception(
+                "failed to process event %d times. Giving up.",
+                context.retry_context.retry_count + 1,
+            )
+        else:
+            logging.exception(
+                "failed to process event %d times. Retrying...",
+                context.retry_context.retry_count + 1,
+            )
+            raise
