@@ -98,8 +98,10 @@
     }
   },
   "variables": {
+    "applicationInsightsName": "[parameters('functionAppName')]",
     "hostingPlanName": "[parameters('functionAppName')]",
-    "eventHubAuthorizationRuleName": "[parameters('functionAppName')]",
+    "eventHubAuthListenRuleName": "[parameters('functionAppName')]-listen",
+    "eventHubAuthSendRuleName": "[parameters('functionAppName')]-send",
     "eventHubName": "[parameters('eventHubName')]",
     "eventHubNamespaceName": "[parameters('functionAppName')]",
     "storageAccountName": "[format('logexport{0}', uniqueString(resourceGroup().id))]"
@@ -135,10 +137,23 @@
         {
           "type": "authorizationRules",
           "apiVersion": "2017-04-01",
-          "name": "[variables('eventHubAuthorizationRuleName')]",
+          "name": "[variables('eventHubAuthListenRuleName')]",
           "properties": {
             "rights": [
               "Listen"
+            ]
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('eventHubNamespaceName'), variables('eventHubName'))]"
+          ]
+        },
+        {
+          "type": "authorizationRules",
+          "apiVersion": "2017-04-01",
+          "name": "[variables('eventHubAuthSendRuleName')]",
+          "properties": {
+            "rights": [
+              "Send"
             ]
           },
           "dependsOn": [
@@ -177,6 +192,19 @@
       "kind": "elastic"
     },
     {
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2020-02-02",
+      "name": "[variables('applicationInsightsName')]",
+      "location": "[parameters('appInsightsLocation')]",
+      "tags": {
+        "[format('hidden-link:{0}', resourceId('Microsoft.Web/sites', variables('applicationInsightsName')))]": "Resource"
+      },
+      "properties": {
+        "Application_Type": "web"
+      },
+      "kind": "web"
+    },
+    {
       "type": "Microsoft.Web/sites",
       "apiVersion": "2022-03-01",
       "name": "[parameters('functionAppName')]",
@@ -188,6 +216,10 @@
         "siteConfig": {
           "linuxFxVersion": "python|3.11",
           "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2020-02-02').InstrumentationKey]"
+            },
             {
               "name": "AzureWebJobsStorage",
               "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', variables('storageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2022-05-01').keys[0].value)]"
@@ -207,6 +239,10 @@
             {
               "name": "FUNCTIONS_WORKER_RUNTIME",
               "value": "python"
+            },
+            {
+              "name": "WEBSITE_NODE_DEFAULT_VERSION",
+              "value": "~14"
             },
             {
               "name": "WEBSITE_RUN_FROM_PACKAGE",
@@ -230,15 +266,16 @@
             },
             {
               "name": "EVENTHUB_CONNECTION",
-              "value": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationRules', variables('eventHubNamespaceName'), variables('eventHubName'), variables('eventHubAuthorizationRuleName')),'2015-08-01').primaryConnectionString]"
+              "value": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationRules', variables('eventHubNamespaceName'), variables('eventHubName'), variables('eventHubAuthListenRuleName')),'2015-08-01').primaryConnectionString]"
             }
           ]
         }
       },
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs/', variables('eventHubNamespaceName'), variables('eventHubName'))]",
-        "[resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationRules', variables('eventHubNamespaceName'), variables('eventHubName'), variables('eventHubAuthorizationRuleName'))]",
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationRules', variables('eventHubNamespaceName'), variables('eventHubName'), variables('eventHubAuthListenRuleName'))]",
         "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
       ]
     },
@@ -255,9 +292,17 @@
     }
   ],
   "outputs": {
-    "eventHub": {
+    "eventHubID": {
       "type": "string",
       "value": "[resourceId('Microsoft.EventHub/namespaces/eventhubs/', variables('eventHubNamespaceName'), variables('eventHubName'))]"
+    },
+    "eventHubName": {
+      "type": "string",
+      "value": "[variables('eventHubName')]"
+    },
+    "eventHubNamespace": {
+      "type": "string",
+      "value": "[variables('eventHubNamespaceName')]"
     }
   }
 }
