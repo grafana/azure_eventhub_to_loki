@@ -43,12 +43,12 @@ def test_deserialization_records():
         assert len(streams[0].entries) == 2
         assert (
             streams[0].labels
-            == """{job="integrations/azure-logexport",category="SQLSecurityAuditEvents"}"""
+            == """{job="integration/azure-logexport",category="SQLSecurityAuditEvents"}"""
         )
         assert len(streams[1].entries) == 1
         assert (
             streams[1].labels
-            == """{job="integrations/azure-logexport",category="SQLSecurityAuditEvents",type="AuditEvent"}"""
+            == """{job="integration/azure-logexport",category="SQLSecurityAuditEvents",type="AuditEvent"}"""
         )
 
 
@@ -84,16 +84,16 @@ def test_deserialization_timestamp():
 
 
 def test_create_labels_string():
-    assert create_labels_string(None, None) == '{job="integrations/azure-logexport"}'
+    assert create_labels_string(None, None) == '{job="integration/azure-logexport"}'
     assert (
         create_labels_string("cat1", "type1")
-        == '{job="integrations/azure-logexport",category="cat1",type="type1"}'
+        == '{job="integration/azure-logexport",category="cat1",type="type1"}'
     )
     assert (
         create_labels_string(None, "type1")
-        == '{job="integrations/azure-logexport",type="type1"}'
+        == '{job="integration/azure-logexport",type="type1"}'
     )
     assert (
         create_labels_string("cat1", None)
-        == '{job="integrations/azure-logexport",category="cat1"}'
+        == '{job="integration/azure-logexport",category="cat1"}'
     )

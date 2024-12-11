@@ -73,7 +73,7 @@ def get_timestamp(load: dict) -> str | None:
 
 
 def create_labels_string(category: str | None, type: str | None) -> str:
-    labels = 'job="integrations/azure-logexport"'
+    labels = 'job="integration/azure-logexport"'
     if category is not None:
         labels += f',category="{category}"'
     if type is not None:
