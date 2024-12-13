@@ -37,7 +37,9 @@ def entry_from_event_record(
     return load.get("category"), load.get("type"), entry
 
 
-def stream_from_event_body(f) -> Iterable[push_pb2.StreamAdapter]:
+def stream_from_event_body(
+    f, addional_labels: dict[str, str]
+) -> Iterable[push_pb2.StreamAdapter]:
     """Deserializes a single event body into a list of streams.
     Each stream has the job label and category and type labels if present.
     """
@@ -50,16 +52,18 @@ def stream_from_event_body(f) -> Iterable[push_pb2.StreamAdapter]:
         current_ts += 1
 
         (category, type, entry) = entry_from_event_record(i, current_ts)
-        labels = create_labels_string(category, type)
+        labels = create_labels_string(category, type, addional_labels)
         stream = stream_index.setdefault(labels, push_pb2.StreamAdapter(labels=labels))
         stream.entries.append(entry)
 
     return stream_index.values()
 
 
-def streams_from_events(events: Iterable[bytes]) -> Iterable[push_pb2.StreamAdapter]:
+def streams_from_events(
+    events: Iterable[bytes], additional_labels: dict[str, str]
+) -> Iterable[push_pb2.StreamAdapter]:
     for event in events:
-        for stream in stream_from_event_body(event):
+        for stream in stream_from_event_body(event, additional_labels):
             yield stream
 
 
@@ -72,8 +76,14 @@ def get_timestamp(load: dict) -> str | None:
     )
 
 
-def create_labels_string(category: str | None, type: str | None) -> str:
+def create_labels_string(
+    category: str | None, type: str | None, addional_labels: dict[str, str]
+) -> str:
     labels = 'job="integration/azure-logexport"'
+
+    for key, value in addional_labels.items():
+        labels += f',{key}="{value}"'
+
     if category is not None:
         labels += f',category="{category}"'
     if type is not None:

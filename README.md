@@ -54,6 +54,11 @@ resource "azurerm_resource_group_template_deployment" "logexport" {
 - `LOKI_USERNAME`: The optional username to use for authentication with Loki.
 - `LOKI_PASSWORD`: The optional password to use for authentication with Loki.
 
+### Additional Labels
+
+Additional stream labels can be configured by setting environment variables with the prefix `ADDITIONAL_LABEL_`. For example,
+setting `ADDITIONAL_LABEL_cluster=dev` will add a label `cluster=dev` to all streams.
+
 ## Release
 
 The logexport function is packaged as a ZIP file via `make "logexport.$(python -m setuptools_scm).zip"`. The version is
