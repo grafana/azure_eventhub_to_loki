@@ -38,7 +38,7 @@ def test_deserialization_message():
 
 def test_deserialization_records():
     with open("tests/record_sample.json", "rb") as f:
-        streams = list(stream_from_event_body(f))
+        streams = list(stream_from_event_body(f, {}))
         assert len(streams) == 2
         assert len(streams[0].entries) == 2
         assert (
@@ -84,16 +84,20 @@ def test_deserialization_timestamp():
 
 
 def test_create_labels_string():
-    assert create_labels_string(None, None) == '{job="integration/azure-logexport"}'
+    assert create_labels_string(None, None, {}) == '{job="integration/azure-logexport"}'
     assert (
-        create_labels_string("cat1", "type1")
+        create_labels_string("cat1", "type1", {})
         == '{job="integration/azure-logexport",category="cat1",type="type1"}'
     )
     assert (
-        create_labels_string(None, "type1")
+        create_labels_string(None, "type1", {})
         == '{job="integration/azure-logexport",type="type1"}'
     )
     assert (
-        create_labels_string("cat1", None)
+        create_labels_string("cat1", None, {})
         == '{job="integration/azure-logexport",category="cat1"}'
+    )
+    assert (
+        create_labels_string("cat1", None, {"cluster": "dev"})
+        == '{job="integration/azure-logexport",cluster="dev",category="cat1"}'
     )
