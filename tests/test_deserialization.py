@@ -37,19 +37,30 @@ def test_deserialization_message():
 
 
 def test_deserialization_records():
-    with open("tests/record_sample.json", "rb") as f:
-        streams = list(stream_from_event_body(f, {}))
-        assert len(streams) == 2
-        assert len(streams[0].entries) == 2
-        assert (
-            streams[0].labels
-            == """{job="integration/azure-logexport",category="SQLSecurityAuditEvents"}"""
-        )
-        assert len(streams[1].entries) == 1
-        assert (
-            streams[1].labels
-            == """{job="integration/azure-logexport",category="SQLSecurityAuditEvents",type="AuditEvent"}"""
-        )
+    @dataclass
+    class TestCase:
+        path: str
+        expected_labels: list[str]
+
+    test_cases = [
+        TestCase(
+            "tests/record_sample.json",
+            [
+                '{job="integration/azure-logexport",category="SQLSecurityAuditEvents"}',
+                '{job="integration/azure-logexport",category="SQLSecurityAuditEvents",type="AuditEvent"}',
+            ],
+        ),
+        TestCase(
+            "tests/record_issue_15.json",
+            ['{job="integration/azure-logexport"}'],
+        ),
+    ]
+    for case in test_cases:
+        with open(case.path, "rb") as f:
+            streams = list(stream_from_event_body(f, {}))
+            assert len(streams) == len(case.expected_labels)
+            for i, stream in enumerate(streams):
+                assert stream.labels == case.expected_labels[i]
 
 
 def test_deserialization_timestamp():

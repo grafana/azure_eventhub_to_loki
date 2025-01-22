@@ -46,7 +46,7 @@ def stream_from_event_body(
 
     stream_index: dict[str, push_pb2.StreamAdapter] = {}
     current_ts = time.time_ns()
-    for i in ijson.items(f, "records.item"):
+    for i in ijson.items(f, "records.item", use_float=True):
 
         # Each record should receive it's own unique timestamp.
         current_ts += 1

@@ -1,0 +1,26 @@
+{
+    "records": [
+        {
+            "count": 17,
+            "total": 298,
+            "minimum": 2,
+            "maximum": 21,
+            "average": 17.5294117647059,
+            "resourceId": "/SUBSCRIPTIONS/<redacted_subscription_id>/RESOURCEGROUPS/RG-DIAGNOSTICS/PROVIDERS/MICROSOFT.EVENTHUB/NAMESPACES/<redacted_eventhub_namespace_name>",
+            "time": "2025-01-20T09:12:00.0000000Z",
+            "metricName": "IncomingRequests",
+            "timeGrain": "PT1M"
+        },
+        {
+            "count": 17,
+            "total": 286,
+            "minimum": 2,
+            "maximum": 20,
+            "average": 16.8235294117647,
+            "resourceId": "/SUBSCRIPTIONS/<redacted_subscription_id/RESOURCEGROUPS/RG-DIAGNOSTICS/PROVIDERS/MICROSOFT.EVENTHUB/NAMESPACES/<redacted_eventhub_namespace_name>",
+            "time": "2025-01-20T09:13:00.0000000Z",
+            "metricName": "IncomingRequests",
+            "timeGrain": "PT1M"
+        }
+    ]
+}
