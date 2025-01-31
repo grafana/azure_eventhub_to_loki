@@ -46,13 +46,13 @@ def test_deserialization_records():
         TestCase(
             "tests/record_sample.json",
             [
-                '{job="integration/azure-logexport",category="SQLSecurityAuditEvents"}',
-                '{job="integration/azure-logexport",category="SQLSecurityAuditEvents",type="AuditEvent"}',
+                '{job="integrations/azure-logexport",category="SQLSecurityAuditEvents"}',
+                '{job="integrations/azure-logexport",category="SQLSecurityAuditEvents",type="AuditEvent"}',
             ],
         ),
         TestCase(
             "tests/record_issue_15.json",
-            ['{job="integration/azure-logexport"}'],
+            ['{job="integrations/azure-logexport"}'],
         ),
     ]
     for case in test_cases:
@@ -95,20 +95,22 @@ def test_deserialization_timestamp():
 
 
 def test_create_labels_string():
-    assert create_labels_string(None, None, {}) == '{job="integration/azure-logexport"}'
+    assert (
+        create_labels_string(None, None, {}) == '{job="integrations/azure-logexport"}'
+    )
     assert (
         create_labels_string("cat1", "type1", {})
-        == '{job="integration/azure-logexport",category="cat1",type="type1"}'
+        == '{job="integrations/azure-logexport",category="cat1",type="type1"}'
     )
     assert (
         create_labels_string(None, "type1", {})
-        == '{job="integration/azure-logexport",type="type1"}'
+        == '{job="integrations/azure-logexport",type="type1"}'
     )
     assert (
         create_labels_string("cat1", None, {})
-        == '{job="integration/azure-logexport",category="cat1"}'
+        == '{job="integrations/azure-logexport",category="cat1"}'
     )
     assert (
         create_labels_string("cat1", None, {"cluster": "dev"})
-        == '{job="integration/azure-logexport",cluster="dev",category="cat1"}'
+        == '{job="integrations/azure-logexport",cluster="dev",category="cat1"}'
     )
