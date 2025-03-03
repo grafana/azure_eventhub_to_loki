@@ -2,6 +2,12 @@ An Azure function that consume eventhub messages and ships them to Grafana Loki 
 
 The function consumes resource and activity log messages from an Azure EventHub and ships them to a Grafana Loki instance.
 
+It supports Azure Diagnostics
+[resource](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/resource-logs-schema) and
+[activity](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/activity-log-schema) log events as well as
+Defender for Clouds [continuous export](https://learn.microsoft.com/en-us/azure/defender-for-cloud/continuous-export)
+messages.
+
 ## Installation
 
 The repository comes with an [Azure ARM template](https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/overview)
