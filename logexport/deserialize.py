@@ -34,7 +34,7 @@ def entry_from_event_record(
 
     typ = load.get("type")
     if typ is None and load.get("ProductName") == "Microsoft Defender for Cloud":
-        typ = "Alert/" + load.get("AlertType")
+        typ = "Alert/" + (load.get("AlertType") or "Unknown")
 
     return load.get("category"), typ, entry
 
