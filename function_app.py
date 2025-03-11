@@ -8,6 +8,7 @@ import azure.functions as func
 from logexport.config import get_additional_labels
 from logexport.deserialize import streams_from_events
 from logexport.loki import LokiClient
+from logexport.loki.client import LokiClientError
 
 # Constants defining environment variables names
 EVENTHUB_NAME_VAR: Final[str] = "EVENTHUB_NAME"
@@ -57,8 +58,10 @@ def logexport(events: List[func.EventHubEvent], context: func.Context) -> None:
             len(events),
         )
         loki_client.push(streams)
-    except Exception:
-        if context.retry_context.retry_count == context.retry_context.max_retry_count:
+    except Exception as e:
+        if isinstance(e, LokiClientError) and not e.is_retryable():
+            logging.exception("failed to process event with non-retryable error.")
+        elif context.retry_context.retry_count == context.retry_context.max_retry_count:
             logging.exception(
                 "failed to process event %d times. Giving up.",
                 context.retry_context.retry_count + 1,
