@@ -1,8 +1,8 @@
 import pytest
-from loki_test_server import LokiContainer
 
 from logexport.loki.client import LokiClient
 from logexport.push import push_pb2
+from loki_test_server import LokiContainer
 
 loki = LokiContainer()
 

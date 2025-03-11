@@ -1,0 +1,88 @@
+{
+     "subAssessmentEventDataEnrichment": {
+          "action": "Insert",
+          "apiVersion": "2020-01-01",
+          "isSnapshot": false
+     },
+     "securityEventDataEnrichment": {
+          "action": "Insert",
+          "apiVersion": "2020-01-01",
+          "isSnapshot": false
+     },
+     "tenantId": "tenant",
+     "type": "Microsoft.Security/assessments/subAssessments",
+     "id": "/subscriptions/11111111-1111-1111-1111-1111111111/resourceGroups/resource-group/providers/Microsoft.ContainerService/managedClusters/aks-cluster/providers/Microsoft.Security/assessments/c609cf0f-71ab-41e9-a3c6-9a1f7fe1b8d5/subassessments/name",
+     "name": "name",
+     "properties": {
+          "status": {
+               "code": "NotApplicable",
+               "severity": "Unknown",
+               "cause": "Unscanned",
+               "description": "Image not scanned"
+          },
+          "timeGenerated": "2025-02-20T16:49:59.1011021Z",
+          "resourceDetails": {
+               "nativeResourceId": "/subscriptions/11111111-1111-1111-1111-1111111111/resourceGroups/resource-group/providers/Microsoft.ContainerService/managedClusters/aks-cluster",
+               "resourceName": "aks-cluster",
+               "resourceType": "managedClusters",
+               "resourceProvider": "Microsoft.ContainerService",
+               "source": "Azure",
+               "id": "11111111.azurecr.io/stable/service@sha256:tag"
+          },
+          "additionalData": {
+               "assessedResourceType": "AzureRuntimeImageVulnerability",
+               "clusterDetails": {
+                    "clusterResourceId": "/subscriptions/11111111-1111-1111-1111-1111111111/resourceGroups/resource-group/providers/Microsoft.ContainerService/managedClusters/aks-cluster",
+                    "clusterName": "aks-cluster"
+               },
+               "kubernetesContext": {
+                    "workloads": [
+                         {
+                              "kind": "ReplicaSet",
+                              "name": "service-tag",
+                              "namespace": "backbase",
+                              "ownedResources": [
+                                   {
+                                        "containers": [
+                                             {
+                                                  "name": "main"
+                                             }
+                                        ],
+                                        "kind": "Pod",
+                                        "name": "service-tag-4m2cr"
+                                   },
+                                   {
+                                        "containers": [
+                                             {
+                                                  "name": "main"
+                                             }
+                                        ],
+                                        "kind": "Pod",
+                                        "name": "service-tag-t6wjh"
+                                   },
+                                   {
+                                        "containers": [
+                                             {
+                                                  "name": "main"
+                                             }
+                                        ],
+                                        "kind": "Pod",
+                                        "name": "service-tag-9jht2"
+                                   }
+                              ]
+                         }
+                    ]
+               },
+               "artifactDetails": {
+                    "repositoryName": "",
+                    "registryHost": "11111111.azurecr.io",
+                    "digest": "sha256:tag",
+                    "artifactType": "ContainerImage"
+               },
+               "metadata": {
+                    "inventorySource": "Agent",
+                    "scanner": "MicrosoftDefenderVulnerabilityManagement"
+               }
+          }
+     }
+}
