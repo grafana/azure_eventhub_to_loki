@@ -30,10 +30,13 @@ def entry_from_event_record(
     if "correlationId" in load:
         entry.structuredMetadata.add(name="correlationId", value=load["correlationId"])
 
-    # TODO: decide what the body should be
     entry.line = json.dumps(load)
 
-    return load.get("category"), load.get("type"), entry
+    typ = load.get("type")
+    if typ is None and load.get("ProductName") == "Microsoft Defender for Cloud":
+        typ = "Alert/" + load.get("AlertType")
+
+    return load.get("category"), typ, entry
 
 
 def stream_from_event_body(
