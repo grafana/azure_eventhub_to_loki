@@ -1,0 +1,96 @@
+{
+     "VendorName": "Microsoft",
+     "AlertType": "SIMULATED_KV_ListGetAnomaly",
+     "ProductName": "Microsoft Defender for Cloud",
+     "StartTimeUtc": "2025-02-20T18:44:10.5893535Z",
+     "EndTimeUtc": "2025-02-20T18:44:10.5893535Z",
+     "TimeGenerated": "2025-02-20T18:44:20.835Z",
+     "ProcessingEndTime": "2025-02-20T18:44:20.5902225Z",
+     "Severity": "Medium",
+     "Status": "New",
+     "ProviderAlertStatus": null,
+     "ConfidenceLevel": null,
+     "ConfidenceScore": null,
+     "ConfidenceReasons": null,
+     "IsIncident": false,
+     "SystemAlertId": "dce2adb7-a249-3639-1574-c6571793f490",
+     "CorrelationKey": null,
+     "Intent": "Unknown",
+     "AzureResourceId": "/SUBSCRIPTIONS/11111111-1111-1111-1111-1111111111/RESOURCEGROUPS/Sample-RG/providers/microsoft.keyvault/vaults/Sample-KV",
+     "WorkspaceId": null,
+     "WorkspaceSubscriptionId": null,
+     "WorkspaceResourceGroup": null,
+     "AgentId": null,
+     "CompromisedEntity": "Sample-KV",
+     "AlertDisplayName": "[SAMPLE ALERT] Suspicious secret listing and query in a Key Vault",
+     "Description": "THIS IS A SAMPLE ALERT: While may be benign it could also indicate that a Secret List operation was followed by numerous Secret Get operations. In addition, this operation pattern is not normally performed by the user on this vault. This is likely indicative that someone is dumping the This is sample alert: secrets stored in the Key Vault for potentially malicious purposes.",
+     "Entities": [
+          {
+               "$id": "4",
+               "ResourceId": "/SUBSCRIPTIONS/11111111-1111-1111-1111-1111111111/RESOURCEGROUPS/Sample-RG/providers/microsoft.keyvault/vaults/Sample-KV",
+               "ResourceType": "Key Vault",
+               "ResourceName": "Sample-KV",
+               "Metadata": {
+                    "IsGraphCenter": true
+               },
+               "Asset": true,
+               "Type": "azure-resource"
+          },
+          {
+               "$id": "5",
+               "AadUserId": "00000000-0000-0000-0000-000000000000",
+               "IsDomainJoined": false,
+               "IsValid": false,
+               "Asset": true,
+               "Type": "account"
+          },
+          {
+               "$id": "6",
+               "Address": "00.00.00.00",
+               "Location": {
+                    "CountryCode": "US",
+                    "CountryName": "United States",
+                    "State": "Virginia",
+                    "City": "Washington"
+               },
+               "Asset": false,
+               "Type": "ip"
+          }
+     ],
+     "ExtendedLinks": null,
+     "RemediationSteps": [
+          "Please review your activity logs to determine if the access attempts that triggered this alert were legitimate. If you are concerned that these access attempts may not have been legitimate, please contact your security administrator and disable access policies to the user or application and rotate the secrets, keys, and passwords stored in this key vault."
+     ],
+     "ExtendedProperties": {
+          "resourceType": "Key Vault",
+          "End Time UTC": "02/20/2025 18:44:10",
+          "All vault operations in last 24 hours": "[Authentication:1, SecretGet:3, VaultGet:1, SecretList:5]",
+          "Suspicious Operations": "[SecretGet:3, SecretList:5]",
+          "Attacker IP Address": "00.00.00.00",
+          "Attacker Object ID": "00000000-0000-0000-0000-000000000000",
+          "Application ID": "00000000-0000-0000-0000-000000000000",
+          "Result Signature": "OK",
+          "Start Time UTC": "02/20/2025 18:44:10",
+          "Client Information": "FxVersion/4.8.4075.0 OSName/Windows10Enterprise OSVersion/6.3.18363 Microsoft.Azure.KeyVault.KeyVaultClient/3.0.0.1",
+          "Alert Reasons": "[The application(appid) does not usually access this vault, The application(appid) does not usually come from this IP, The application(appid) does not usually perform a credential list operation followed by a get operation, The application(appid) does not usually perform this operation, The number of applications which accessed this vault is more than usual, The number of users(objid) who accessed this vault is more than usual, The user(objid) does not usually access this vault, The user(objid) does not usually come from this IP, The user(objid) does not usually perform a credential list operation followed by a get operation, The user(objid) does not usually perform this operation, This vault does not usually have a credential list operation followed by a get operation, This vault does not usually have this operation, This vault had more operations than usual, This vault had more types of operations than usual, This vault is not usually accessed from this IP] Note: related application(appid), user(objid), IP and operations are included in appid, objid, callerIpAddress and suspiciousOperations entries, respectively",
+          "Target": "https://sample.vault.azure.net/secrets/sample",
+          "EffectiveAzureResourceId": "/SUBSCRIPTIONS/11111111-1111-1111-1111-1111111111/RESOURCEGROUPS/Sample-RG/providers/microsoft.keyvault/vaults/Sample-KV",
+          "CompromisedEntity": "Sample-KV",
+          "ProductComponentName": "KeyVault",
+          "EffectiveSubscriptionId": "11111111-1111-1111-1111-1111111111"
+     },
+     "ResourceIdentifiers": [
+          {
+               "$id": "2",
+               "AzureResourceId": "/SUBSCRIPTIONS/11111111-1111-1111-1111-1111111111/RESOURCEGROUPS/Sample-RG/providers/microsoft.keyvault/vaults/Sample-KV",
+               "Type": "AzureResource",
+               "AzureResourceTenantId": "tenant"
+          },
+          {
+               "$id": "3",
+               "AadTenantId": "tenant",
+               "Type": "AAD"
+          }
+     ],
+     "AlertUri": "https://portal.azure.com/#blade/Microsoft_Azure_Security_AzureDefenderForData/AlertBlade/alertId/dce2adb7-a249-3639-1574-c6571793f490/subscriptionId/11111111-1111-1111-1111-1111111111/resourceGroup/Sample-RG/referencedFrom/alertDeepLink/location/westeurope"
+}

@@ -1,9 +1,8 @@
 import json
 import time
 from collections.abc import Iterable
+from io import IOBase
 from typing import Final, Tuple
-
-import ijson  # type: ignore
 
 from logexport._version import __version__
 from logexport.push import push_pb2
@@ -38,7 +37,7 @@ def entry_from_event_record(
 
 
 def stream_from_event_body(
-    f, addional_labels: dict[str, str]
+    f: IOBase | bytes, addional_labels: dict[str, str]
 ) -> Iterable[push_pb2.StreamAdapter]:
     """Deserializes a single event body into a list of streams.
     Each stream has the job label and category and type labels if present.
@@ -46,12 +45,25 @@ def stream_from_event_body(
 
     stream_index: dict[str, push_pb2.StreamAdapter] = {}
     current_ts = time.time_ns()
-    for i in ijson.items(f, "records.item", use_float=True):
 
+    if isinstance(f, bytes):
+        data = json.loads(f)
+    else:
+        data = json.load(f)
+
+    for i in data.get("records", []):
         # Each record should receive it's own unique timestamp.
         current_ts += 1
 
         (category, type, entry) = entry_from_event_record(i, current_ts)
+        labels = create_labels_string(category, type, addional_labels)
+        stream = stream_index.setdefault(labels, push_pb2.StreamAdapter(labels=labels))
+        stream.entries.append(entry)
+    if "records" not in data:
+        # Use the whole body as a single event
+        current_ts += 1
+
+        (category, type, entry) = entry_from_event_record(data, current_ts)
         labels = create_labels_string(category, type, addional_labels)
         stream = stream_index.setdefault(labels, push_pb2.StreamAdapter(labels=labels))
         stream.entries.append(entry)
