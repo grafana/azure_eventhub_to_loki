@@ -56,7 +56,9 @@ def test_deserialization_records():
         ),
         TestCase(
             "tests/issue_19_sample_1.json",
-            ['{job="integrations/azure-logexport",type="Alert/SIMULATED_KV_ListGetAnomaly"}'],
+            [
+                '{job="integrations/azure-logexport",type="Alert/SIMULATED_KV_ListGetAnomaly"}'
+            ],
         ),
         TestCase(
             "tests/issue_19_sample_2.json",
