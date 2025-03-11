@@ -9,30 +9,35 @@ dependencies = [
   "requests==2.32.3",
 ]
 description = "Azure function to send eventhub events to Grafana Loki / Grafana Cloud"
+dynamic = ["version"]
 name = "logexport"
 requires-python = ">= 3.11"
-dynamic = ["version"]
 
 [build-system]
 build-backend = "setuptools.build_meta"
 requires = ["setuptools>=64", "setuptools-scm>=8"]
 
 [project.optional-dependencies]
+package = [
+  "setuptools_scm>=8",
+]
 test = [
   "black==24.10.0",
-  "isort==5.13.2",
+  "isort==6.0.1",
   "mypy==1.11.2",
   "pytest==8.3.3",
   "testcontainers==4.8.2",
   "types-protobuf==5.28.3.20241030",
   "types-requests==2.32.0.20241016",
 ]
-package = [
-  "setuptools_scm>=8",
-]
+
+[tool.black]
+exclude = "logexport/_version.py"
 
 [tool.isort]
 profile = "black"
+skip = ["logexport/_version.py"]
+src_paths = ["logexport", "tests", "function_app.py"]
 
 [tool.pytest.ini_options]
 pythonpath = [

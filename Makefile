@@ -7,13 +7,13 @@ clean:
 .PHONY: lint
 lint:
 	mypy function_app.py logexport
-	isort --skip "logexport/_version.py" -c function_app.py logexport/* tests/*
-	black --check --exclude "logexport/_version.py" function_app.py logexport tests
+	isort --check --diff --settings-file pyproject.toml logexport tests function_app.py
+	black --check function_app.py logexport tests
 
 .PHONY: fmt
 fmt:
-	isort --skip "logexport/_version.py" function_app.py logexport/* tests/*
-	black --exclude "logexport/_version.py" function_app.py logexport tests
+	isort --settings-file pyproject.toml logexport tests function_app.py
+	black function_app.py logexport tests
 
 protos: push.proto buf.gen.yaml buf.yaml
 	buf generate .
