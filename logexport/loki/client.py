@@ -9,6 +9,32 @@ from requests.auth import HTTPBasicAuth
 from logexport.push import push_pb2
 
 
+class LokiClientError(HTTPError):
+    """An error occurred when making a request to Loki."""
+
+    def __init__(self, status_code: int, url: str, message: str):
+        super().__init__(f"{status_code} Client Error for url: {url}: {message}")
+        self.status_code = status_code
+        self.url = url
+        self.message = message
+
+    def is_retryable(self) -> bool:
+        return (
+            "entry too far behind" not in self.message
+            and "timestamp too old" not in self.message
+        )
+
+
+class LokiServerError(HTTPError):
+    """An error occurred when making a request to Loki."""
+
+    def __init__(self, status_code: int, url: str, message: str):
+        super().__init__(f"{status_code} Server Error for url: {url}: {message}")
+        self.status_code = status_code
+        self.url = url
+        self.message = message
+
+
 class LokiClient:
 
     endpoint: str
@@ -40,13 +66,9 @@ class LokiClient:
             req.auth = self.auth
         res = requests.Session().send(req.prepare())
         if 400 <= res.status_code < 500:
-            raise HTTPError(
-                f"{res.status_code} Client Error for url: {res.url}: {res.text}"
-            )
+            raise LokiClientError(res.status_code, res.url, res.text)
         elif 500 <= res.status_code < 600:
-            raise HTTPError(
-                f"{res.status_code} Server Error for url: {res.url}: {res.text}"
-            )
+            raise LokiServerError(res.status_code, res.url, res.text)
 
     def query(self, query: str):
         res = requests.get(
