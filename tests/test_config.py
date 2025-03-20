@@ -1,4 +1,6 @@
-from logexport.config import get_additional_labels_from_mapping
+import jq
+
+from logexport.config import get_additional_labels_from_mapping, get_filter_from_mapping
 
 
 def test_get_additional_labels():
@@ -17,3 +19,8 @@ def test_get_additional_labels():
         "a": "{}"
     }
     assert get_additional_labels_from_mapping({"ADDITIONAL_LABEL_": "b"}) == {}
+
+
+def test_get_filter():
+    assert get_filter_from_mapping(None) is None
+    assert get_filter_from_mapping(".") is not None

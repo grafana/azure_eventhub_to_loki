@@ -5,6 +5,7 @@ from io import IOBase
 from typing import Final, Tuple
 
 from logexport._version import __version__
+from logexport.filter import apply_filter
 from logexport.push import push_pb2
 
 VERSION_LABEL_KEY: Final[str] = "__grafana_azure_logexport_version__"
@@ -57,6 +58,10 @@ def stream_from_event_body(
     for i in data.get("records", []):
         # Each record should receive it's own unique timestamp.
         current_ts += 1
+
+        i = apply_filter(i, None)
+        if i is None:
+            continue
 
         (category, type, entry) = entry_from_event_record(i, current_ts)
         labels = create_labels_string(category, type, addional_labels)
