@@ -34,3 +34,5 @@ def get_filter() -> jq._Program | None:
 def get_filter_from_mapping(filter: str | None) -> jq._Program | None:
     if filter is not None:
         return jq.compile(filter)
+
+    return None

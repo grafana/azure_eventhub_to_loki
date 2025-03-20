@@ -59,6 +59,7 @@ def stream_from_event_body(
         # Each record should receive it's own unique timestamp.
         current_ts += 1
 
+        # TODO: log and test
         i = apply_filter(i, None)
         if i is None:
             continue
