@@ -95,6 +95,25 @@ def test_deserialization_filter():
         )
 
 
+def test_deserialization_extracted_fields():
+    f = jq.compile(".properties.log | fromjson")
+    config = Config(additional_labels={}, filter=Filter(f))
+    with open("tests/audit_log.json", "rb") as f:
+        streams = list(stream_from_event_body(f, config))
+        assert len(streams) == 1
+        assert (
+            streams[0].labels
+            == '{job="integrations/azure-logexport",category="kube-audit"}'
+        )
+
+        event = json.loads(streams[0].entries[0].line)
+        assert event["kind"] == "Event"
+        assert event["apiVersion"] == "audit.k8s.io/v1"
+        assert event["level"] == "Metadata"
+        assert event["stage"] == "ResponseComplete"
+        assert event["verb"] == "patch"
+
+
 def test_deserialization_timestamp():
     @dataclass
     class TestCase:

@@ -60,13 +60,15 @@ def stream_from_event_body(
     for i in data.get("records", []):
         # Each record should receive it's own unique timestamp.
         current_ts += 1
+        (category, type, entry) = entry_from_event_record(i, current_ts)
 
         i = config.filter.apply(i)
         if i is None:
             logging.debug("Skipping event %s", i)
             continue
+        else:
+            entry.line = json.dumps(i)
 
-        (category, type, entry) = entry_from_event_record(i, current_ts)
         labels = create_labels_string(category, type, config.additional_labels)
         stream = stream_index.setdefault(labels, push_pb2.StreamAdapter(labels=labels))
         stream.entries.append(entry)
