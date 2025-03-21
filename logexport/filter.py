@@ -1,10 +1,14 @@
-import jq
+import jq  # type: ignore
 
 from logexport.push import push_pb2
 
 
-def apply_filter(line: str, filter: jq._Program) -> dict | list | str | None:
-    if filter is None:
-        return line
+class Filter:
+    def __init__(self, filter):
+        self.filter = filter
 
-    return filter.input(line).first()
+    def apply(self, line: str) -> dict | list | str | None:
+        if self.filter is None:
+            return line
+
+        return self.filter.input(line).first()

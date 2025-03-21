@@ -1,10 +1,19 @@
 import os
+from dataclasses import dataclass
 from typing import Final, Mapping
 
-import jq
+import jq  # type: ignore
+
+from logexport.filter import Filter
 
 ADDITIONAL_LABEL_PREFIX: Final[str] = "ADDITIONAL_LABEL_"
 FILTER: Final[str] = "FILTER"
+
+
+@dataclass
+class Config:
+    filter: Filter
+    additional_labels: dict[str, str]
 
 
 def get_additional_labels() -> dict[str, str]:
@@ -25,14 +34,14 @@ def get_additional_labels_from_mapping(env: Mapping[str, str]) -> dict[str, str]
     return labels
 
 
-def get_filter() -> jq._Program | None:
+def get_filter() -> Filter:
     """Returns a jq filter to apply to the exported streams.
     The filter is configured through an environment variable."""
     return get_filter_from_mapping(os.environ.get(FILTER))
 
 
-def get_filter_from_mapping(filter: str | None) -> jq._Program | None:
+def get_filter_from_mapping(filter: str | None) -> Filter:
     if filter is not None:
-        return jq.compile(filter)
+        return Filter(jq.compile(filter))
 
-    return None
+    return Filter(None)

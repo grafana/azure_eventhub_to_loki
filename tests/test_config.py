@@ -22,5 +22,5 @@ def test_get_additional_labels():
 
 
 def test_get_filter():
-    assert get_filter_from_mapping(None) is None
-    assert get_filter_from_mapping(".") is not None
+    assert get_filter_from_mapping(None).filter is None
+    assert get_filter_from_mapping(".").filter is not None

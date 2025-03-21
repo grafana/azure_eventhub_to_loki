@@ -1,11 +1,12 @@
 import json
 import time
 from collections.abc import Iterable
+from dataclasses import dataclass
 from io import IOBase
 from typing import Final, Tuple
 
 from logexport._version import __version__
-from logexport.filter import apply_filter
+from logexport.config import Config
 from logexport.push import push_pb2
 
 VERSION_LABEL_KEY: Final[str] = "__grafana_azure_logexport_version__"
@@ -41,7 +42,7 @@ def entry_from_event_record(
 
 
 def stream_from_event_body(
-    f: IOBase | bytes, addional_labels: dict[str, str]
+    f: IOBase | bytes, config: Config
 ) -> Iterable[push_pb2.StreamAdapter]:
     """Deserializes a single event body into a list of streams.
     Each stream has the job label and category and type labels if present.
@@ -60,12 +61,12 @@ def stream_from_event_body(
         current_ts += 1
 
         # TODO: log and test
-        i = apply_filter(i, None)
+        i = config.filter.apply(i)
         if i is None:
             continue
 
         (category, type, entry) = entry_from_event_record(i, current_ts)
-        labels = create_labels_string(category, type, addional_labels)
+        labels = create_labels_string(category, type, config.additional_labels)
         stream = stream_index.setdefault(labels, push_pb2.StreamAdapter(labels=labels))
         stream.entries.append(entry)
     if "records" not in data:
@@ -73,7 +74,7 @@ def stream_from_event_body(
         current_ts += 1
 
         (category, type, entry) = entry_from_event_record(data, current_ts)
-        labels = create_labels_string(category, type, addional_labels)
+        labels = create_labels_string(category, type, config.additional_labels)
         stream = stream_index.setdefault(labels, push_pb2.StreamAdapter(labels=labels))
         stream.entries.append(entry)
 
@@ -81,10 +82,10 @@ def stream_from_event_body(
 
 
 def streams_from_events(
-    events: Iterable[bytes], additional_labels: dict[str, str]
+    events: Iterable[bytes], config: Config
 ) -> Iterable[push_pb2.StreamAdapter]:
     for event in events:
-        for stream in stream_from_event_body(event, additional_labels):
+        for stream in stream_from_event_body(event, config):
             yield stream
 
 

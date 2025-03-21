@@ -1,6 +1,7 @@
 import json
 from dataclasses import dataclass
 
+from logexport.config import Config
 from logexport.deserialize import (
     VERSION_LABEL_KEY,
     create_labels_string,
@@ -8,6 +9,7 @@ from logexport.deserialize import (
     get_timestamp,
     stream_from_event_body,
 )
+from logexport.filter import Filter
 from logexport.push import push_pb2
 
 
@@ -69,7 +71,9 @@ def test_deserialization_records():
     ]
     for case in test_cases:
         with open(case.path, "rb") as f:
-            streams = list(stream_from_event_body(f, {}))
+            streams = list(
+                stream_from_event_body(f, Config(additional_labels={}, filter=Filter(None)))
+            )
             assert len(streams) == len(case.expected_labels)
             for i, stream in enumerate(streams):
                 assert stream.labels == case.expected_labels[i]
