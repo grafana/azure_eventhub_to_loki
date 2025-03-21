@@ -7,7 +7,7 @@ import jq  # type: ignore
 from logexport.filter import Filter
 
 ADDITIONAL_LABEL_PREFIX: Final[str] = "ADDITIONAL_LABEL_"
-FILTER: Final[str] = "FILTER"
+FILTER: Final[str] = "JQ_PIPELINE"
 
 
 @dataclass
