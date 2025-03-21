@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 import jq
+import pytest
 
 from logexport.filter import Filter
 from logexport.push import push_pb2
@@ -27,3 +28,9 @@ def test_filter():
     for case in test_cases:
         filter = jq.compile(case.filter)
         assert Filter(filter).apply(case.input) == case.expected
+
+
+def test_filter_error():
+    with pytest.raises(ValueError):
+        filter = jq.compile("broken filter")
+        Filter(filter).apply({"message": "hello"})
