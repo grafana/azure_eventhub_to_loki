@@ -1,4 +1,5 @@
 import json
+import logging
 import time
 from collections.abc import Iterable
 from dataclasses import dataclass
@@ -60,9 +61,9 @@ def stream_from_event_body(
         # Each record should receive it's own unique timestamp.
         current_ts += 1
 
-        # TODO: log and test
         i = config.filter.apply(i)
         if i is None:
+            logging.debug("Skipping event %s", i)
             continue
 
         (category, type, entry) = entry_from_event_record(i, current_ts)

@@ -1,6 +1,8 @@
 import json
 from dataclasses import dataclass
 
+import jq  # type: ignore
+
 from logexport.config import Config
 from logexport.deserialize import (
     VERSION_LABEL_KEY,
@@ -72,11 +74,25 @@ def test_deserialization_records():
     for case in test_cases:
         with open(case.path, "rb") as f:
             streams = list(
-                stream_from_event_body(f, Config(additional_labels={}, filter=Filter(None)))
+                stream_from_event_body(
+                    f, Config(additional_labels={}, filter=Filter(None))
+                )
             )
             assert len(streams) == len(case.expected_labels)
             for i, stream in enumerate(streams):
                 assert stream.labels == case.expected_labels[i]
+
+
+def test_deserialization_filter():
+    f = jq.compile('. | select(.type == "AuditEvent")')
+    config = Config(additional_labels={}, filter=Filter(f))
+    with open("tests/record_sample.json", "rb") as f:
+        streams = list(stream_from_event_body(f, config))
+        assert len(streams) == 1
+        assert (
+            streams[0].labels
+            == '{job="integrations/azure-logexport",category="SQLSecurityAuditEvents",type="AuditEvent"}'
+        )
 
 
 def test_deserialization_timestamp():

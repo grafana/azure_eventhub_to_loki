@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 import jq
 
-from logexport.filter import apply_filter
+from logexport.filter import Filter
 from logexport.push import push_pb2
 
 
@@ -26,5 +26,4 @@ def test_filter():
 
     for case in test_cases:
         filter = jq.compile(case.filter)
-        print(type(apply_filter(case.input, filter)))
-        assert apply_filter(case.input, filter) == case.expected
+        assert Filter(filter).apply(case.input) == case.expected

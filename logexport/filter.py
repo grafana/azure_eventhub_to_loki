@@ -11,4 +11,7 @@ class Filter:
         if self.filter is None:
             return line
 
-        return self.filter.input(line).first()
+        r = self.filter.input(line).all()
+        if len(r) == 0:
+            return None
+        return r[0]
