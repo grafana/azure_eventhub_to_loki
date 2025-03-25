@@ -65,6 +65,22 @@ resource "azurerm_resource_group_template_deployment" "logexport" {
 Additional stream labels can be configured by setting environment variables with the prefix `ADDITIONAL_LABEL_`. For example,
 setting `ADDITIONAL_LABEL_cluster=dev` will add a label `cluster=dev` to all streams.
 
+### Record Processing
+
+Each event record can be processed with [jq](https://jqlang.org/manual/) by defining the optional `JQ_PIPELINE` environment variable.
+
+For example given the following event:
+
+```json
+{
+  "properties": {
+    "log": "{\"kind\": \"AuditEvent\"}"
+  }
+}
+```
+
+The nested JSON can be extract with `JQ_PIPELINE=".properties.log | fromjson"`.
+
 ## Release
 
 The logexport function is packaged as a ZIP file via `make "logexport.$(python -m setuptools_scm).zip"`. The version is
