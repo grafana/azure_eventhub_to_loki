@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import jq
 import pytest
 
-from logexport.filter import Filter
+from logexport.filter import Filter, FilterError
 from logexport.push import push_pb2
 
 
@@ -23,14 +23,23 @@ def test_filter():
             {"message": "hello", "uid": "123", "dropped": True},
             "hello,123",
         ),
+        TestCase(
+            ".messages[].message",
+            {"messages": [{"message": "hello"}, {"message": "world"}]},
+            ["hello", "world"],
+        ),
+        TestCase(
+            ".messages[].message",
+            {"messages": [{"message": "hello"}]},
+            "hello",
+        ),
     ]
 
     for case in test_cases:
-        filter = jq.compile(case.filter)
-        assert Filter(filter).apply(case.input) == case.expected
+        filter = Filter(case.filter)
+        assert filter.apply(case.input) == case.expected
 
 
 def test_filter_error():
-    with pytest.raises(ValueError):
-        filter = jq.compile("broken filter")
-        Filter(filter).apply({"message": "hello"})
+    with pytest.raises(FilterError):
+        Filter("broken filter").apply({"message": "hello"})

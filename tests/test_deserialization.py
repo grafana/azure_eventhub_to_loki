@@ -84,8 +84,8 @@ def test_deserialization_records():
 
 
 def test_deserialization_filter():
-    f = jq.compile('. | select(.type == "AuditEvent")')
-    config = Config(additional_labels={}, filter=Filter(f))
+    f = Filter('. | select(.type == "AuditEvent")')
+    config = Config(additional_labels={}, filter=f)
     with open("tests/record_sample.json", "rb") as f:
         streams = list(stream_from_event_body(f, config))
         assert len(streams) == 1
@@ -96,8 +96,8 @@ def test_deserialization_filter():
 
 
 def test_deserialization_extracted_fields():
-    f = jq.compile(".properties.log | fromjson")
-    config = Config(additional_labels={}, filter=Filter(f))
+    f = Filter(".properties.log | fromjson")
+    config = Config(additional_labels={}, filter=f)
     with open("tests/audit_log.json", "rb") as f:
         streams = list(stream_from_event_body(f, config))
         assert len(streams) == 1

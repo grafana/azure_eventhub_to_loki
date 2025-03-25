@@ -65,7 +65,7 @@ resource "azurerm_resource_group_template_deployment" "logexport" {
 Additional stream labels can be configured by setting environment variables with the prefix `ADDITIONAL_LABEL_`. For example,
 setting `ADDITIONAL_LABEL_cluster=dev` will add a label `cluster=dev` to all streams.
 
-### Record Processing
+### Record Processing and Filtering
 
 Each event record can be processed with [jq](https://jqlang.org/manual/) by defining the optional `JQ_PIPELINE` environment variable.
 
@@ -80,6 +80,10 @@ For example given the following event:
 ```
 
 The nested JSON can be extract with `JQ_PIPELINE=".properties.log | fromjson"`.
+
+If the pipeline returns an array with one element only that element will be emitted.
+
+Empty results are omitted. Thus the pipeline can also be used for filtering.
 
 ## Release
 
