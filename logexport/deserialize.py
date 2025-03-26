@@ -66,6 +66,13 @@ def stream_from_event_body(
         if i is None:
             logging.debug("Skipping event %s", i)
             continue
+        elif isinstance(i, list):
+            # TODO: refactor.
+            for item in i:
+                entry.line = json.dumps(item)
+                labels = create_labels_string(category, type, config.additional_labels)
+                stream = stream_index.setdefault(labels, push_pb2.StreamAdapter(labels=labels))
+                stream.entries.append(entry)
         else:
             entry.line = json.dumps(i)
 
@@ -82,7 +89,6 @@ def stream_from_event_body(
         stream.entries.append(entry)
 
     return stream_index.values()
-
 
 def streams_from_events(
     events: Iterable[bytes], config: Config
