@@ -81,7 +81,7 @@ For example given the following event:
 
 The nested JSON can be extract with `JQ_PIPELINE=".properties.log | fromjson"`.
 
-If the pipeline returns an array with one element only that element will be emitted.
+If the pipeline returns an array each element will be a new entry.
 
 Empty results are omitted. Thus the pipeline can also be used for filtering.
 
