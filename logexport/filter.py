@@ -17,18 +17,26 @@ class Filter:
         except ValueError as e:
             raise FilterError(f"Error compiling filter: {e}") from e
 
-    def apply(self, line: str) -> dict | list | str | None:
+    def apply(self, line: dict) -> list:
+        """Apply the jq filter to the line.
+
+        Returns a list of processed lines or an empty list if the line was filtered out.
+        """
         if self.filter is None:
-            return line
+            return [line]
 
         try:
             r = self.filter.input(line).all()
         except ValueError as e:
             raise FilterError(f"Error executing filter: {e}") from e
 
-        if len(r) == 0:
-            return None
+        if r is None:
+            return []
+        elif len(r) == 0:
+            return []
         elif len(r) == 1:
-            return r[0]
+            if r[0] is None:
+                return []
+            return [r[0]]
         else:
             return r

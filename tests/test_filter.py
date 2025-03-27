@@ -15,13 +15,21 @@ def test_filter():
         expected: dict | str
 
     test_cases = [
-        TestCase(".", {"message": "hello"}, {"message": "hello"}),
-        TestCase(".message", {"message": "hello", "other": "field"}, "hello"),
-        TestCase(".not_existing", {"message": "hello", "other": "field"}, None),
+        TestCase(
+            ".",
+            {"message": "hello"},
+            [{"message": "hello"}],
+        ),
+        TestCase(
+            ".message",
+            {"message": "hello", "other": "field"},
+            ["hello"],
+        ),
+        TestCase(".not_existing", {"message": "hello", "other": "field"}, []),
         TestCase(
             '.|[.message,.uid]|join(",")',
             {"message": "hello", "uid": "123", "dropped": True},
-            "hello,123",
+            ["hello,123"],
         ),
         TestCase(
             ".messages[].message",
@@ -31,7 +39,7 @@ def test_filter():
         TestCase(
             ".messages[].message",
             {"messages": [{"message": "hello"}]},
-            "hello",
+            ["hello"],
         ),
     ]
 

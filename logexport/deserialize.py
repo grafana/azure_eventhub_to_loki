@@ -4,7 +4,7 @@ import time
 from collections.abc import Iterable
 from dataclasses import dataclass
 from io import IOBase
-from typing import Final, Tuple
+from typing import Final, Iterator, Tuple
 
 from logexport._version import __version__
 from logexport.config import Config
@@ -57,38 +57,31 @@ def stream_from_event_body(
     else:
         data = json.load(f)
 
-    for i in data.get("records", []):
+    for record in get_records(data):
         # Each record should receive it's own unique timestamp.
         current_ts += 1
-        (category, type, entry) = entry_from_event_record(i, current_ts)
+        (category, type, entry) = entry_from_event_record(record, current_ts)
 
-        i = config.filter.apply(i)
-        if i is None:
-            logging.debug("Skipping event %s", i)
-            continue
-        elif isinstance(i, list):
-            # TODO: refactor.
-            for item in i:
-                entry.line = json.dumps(item)
-                labels = create_labels_string(category, type, config.additional_labels)
-                stream = stream_index.setdefault(labels, push_pb2.StreamAdapter(labels=labels))
-                stream.entries.append(entry)
-        else:
-            entry.line = json.dumps(i)
+        for i in config.filter.apply(record):
+            updated = push_pb2.EntryAdapter()
+            updated.CopyFrom(entry)
+            updated.line = json.dumps(i)
 
-        labels = create_labels_string(category, type, config.additional_labels)
-        stream = stream_index.setdefault(labels, push_pb2.StreamAdapter(labels=labels))
-        stream.entries.append(entry)
-    if "records" not in data:
-        # Use the whole body as a single event
-        current_ts += 1
-
-        (category, type, entry) = entry_from_event_record(data, current_ts)
-        labels = create_labels_string(category, type, config.additional_labels)
-        stream = stream_index.setdefault(labels, push_pb2.StreamAdapter(labels=labels))
-        stream.entries.append(entry)
+            labels = create_labels_string(category, type, config.additional_labels)
+            stream = stream_index.setdefault(
+                labels, push_pb2.StreamAdapter(labels=labels)
+            )
+            stream.entries.append(updated)
 
     return stream_index.values()
+
+
+def get_records(data: dict) -> Iterator[dict]:
+    for i in data.get("records", []):
+        yield i
+    if "records" not in data:
+        yield data
+
 
 def streams_from_events(
     events: Iterable[bytes], config: Config
