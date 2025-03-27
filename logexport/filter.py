@@ -34,9 +34,7 @@ class Filter:
             return []
         elif len(r) == 0:
             return []
-        elif len(r) == 1:
-            if r[0] is None:
-                return []
-            return [r[0]]
+        elif len(r) == 1 and r[0] is None:
+            return []
         else:
             return r
