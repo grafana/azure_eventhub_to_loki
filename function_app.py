@@ -5,8 +5,8 @@ from typing import Final, List
 
 import azure.functions as func
 
-from logexport.config import get_additional_labels
-from logexport.deserialize import streams_from_events
+from logexport.config import get_additional_labels, get_filter
+from logexport.deserialize import Config, streams_from_events
 from logexport.loki import LokiClient
 from logexport.loki.client import LokiClientError
 
@@ -50,9 +50,11 @@ if "EVENTHUB_NAME" not in os.environ:
 )
 def logexport(events: List[func.EventHubEvent], context: func.Context) -> None:
     try:
-        streams = streams_from_events(
-            (event.get_body() for event in events), get_additional_labels()
+        config = Config(
+            additional_labels=get_additional_labels(),
+            filter=get_filter(),
         )
+        streams = streams_from_events((event.get_body() for event in events), config)
         logging.info(
             "Python EventHub trigger processed a %d events",
             len(events),

@@ -1,0 +1,16 @@
+{
+    "records": [
+        {
+            "category": "kube-audit",
+            "operationName": "Microsoft.ContainerService/managedClusters/diagnosticLogs/Read",
+            "properties": {
+                "containerID": "1234",
+                "log": "{\"kind\":\"Event\",\"apiVersion\":\"audit.k8s.io\/v1\",\"level\":\"Metadata\",\"auditID\":\"1499f494-2b96-4afa-99f8-f7e95c0aea17\",\"stage\":\"ResponseComplete\",\"requestURI\":\"\/apis\/keda.sh\/v1alpha1\/namespaces\/grafana-datasources\/scaledobjects\/servicenow-datasource-grafana-app-instant\/status\",\"verb\":\"patch\",\"user\":{\"username\":\"system:serviceaccount:keda:keda-operator\",\"uid\":\"1234340-11334\",\"groups\":[\"system:serviceaccounts\",\"system:serviceaccounts:keda\",\"system:authenticated\"],\"extra\":{\"authentication.kubernetes.io\/credential-id\":[\"JTI=bbbbb\"],\"authentication.kubernetes.io\/node-name\":[\"aks-mainz1234-5678-\"],\"authentication.kubernetes.io\/node-uid\":[\"1234-5678\"],\"authentication.kubernetes.io\/pod-name\":[\"keda-operator-987654321-pphrx\"],\"authentication.kubernetes.io\/pod-uid\":[\"my-pod\"]}},\"sourceIPs\":[\"127.0.0.1\"],\"userAgent\":\"keda\/v0.0.0 (linux\/amd64) kubernetes\/$Format\",\"objectRef\":{\"resource\":\"scaledobjects\",\"namespace\":\"my-workload\",\"name\":\"service\",\"apiGroup\":\"keda.sh\",\"apiVersion\":\"v1alpha1\",\"subresource\":\"status\"},\"responseStatus\":{\"metadata\":{},\"code\":200},\"requestReceivedTimestamp\":\"1856-07-10T18:00:56.972003Z\",\"stageTimestamp\":\"2024-12-10T18:00:56.981151Z\",\"annotations\":{\"authorization.k8s.io\/decision\":\"allow\",\"authorization.k8s.io\/reason\":\"RBAC: allowed by ClusterRoleBinding \\\"keda-operator\\\" of ClusterRole \\\"keda-operator\\\" to ServiceAccount \\\"keda-operator\/keda\\\"\"}}",
+                "pod": "kube-apiserver-hash-xyz",
+                "stream": "stdout"
+            },
+            "serviceBuild": "na",
+            "time": "2020-12-17T18:00:00Z"
+        }
+    ]
+}
