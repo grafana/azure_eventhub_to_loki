@@ -1,3 +1,4 @@
+import logging
 import urllib.parse
 from collections.abc import Iterable
 
@@ -51,8 +52,14 @@ class LokiClient:
 
     def push(self, streams: Iterable[push_pb2.StreamAdapter]):
         push_request = push_pb2.PushRequest()
+        num_streams = 0
         for stream in streams:
             push_request.streams.append(stream)
+            num_streams += 1
+
+        if num_streams == 0:
+            logging.info("Skipping push of 0 streams")
+            return
 
         data: bytes = snappy.compress(push_request.SerializeToString())
 
@@ -70,10 +77,14 @@ class LokiClient:
         elif 500 <= res.status_code < 600:
             raise LokiServerError(res.status_code, res.url, res.text)
 
-    def query(self, query: str):
+    def query_range(self, query: str):
         res = requests.get(
-            urllib.parse.urljoin(self.endpoint, "/loki/api/v1/query"),
+            urllib.parse.urljoin(self.endpoint, "/loki/api/v1/query_range"),
             params={"query": query},
         )
-        res.raise_for_status()
+        if 400 <= res.status_code < 500:
+            raise LokiClientError(res.status_code, res.url, res.text)
+        elif 500 <= res.status_code < 600:
+            raise LokiServerError(res.status_code, res.url, res.text)
+
         return res.json()

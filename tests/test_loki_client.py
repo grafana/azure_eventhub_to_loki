@@ -33,7 +33,7 @@ def test_push(client: LokiClient):
     )
     client.push([stream])
 
-    res = client.query('{foo="bar"}')
+    res = client.query_range('{foo="bar"}')
     assert res["status"] == "success"
     assert res["data"]["result"][0]["values"][0][1] == "one line"
 
@@ -50,3 +50,12 @@ def test_push_non_retryable_error(client: LokiClient):
     with pytest.raises(LokiClientError) as e:
         client.push([stream])
     assert e.value.is_retryable() == False
+
+
+def test_push_empty_stream(client: LokiClient):
+    client.push([])
+    stream = push_pb2.StreamAdapter(
+        labels='{foo="bar"}',
+        entries=[],
+    )
+    client.push([stream])

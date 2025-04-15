@@ -15,7 +15,7 @@ class LokiContainer(DockerContainer):
 
     def __init__(
         self,
-        image: str = "grafana/loki:3.1.2",
+        image: str = "grafana/loki:3.4.3",
         port: int = 3100,
         **kwargs,
     ) -> None:
