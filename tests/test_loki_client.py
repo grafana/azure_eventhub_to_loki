@@ -51,6 +51,7 @@ def test_push_non_retryable_error(client: LokiClient):
         client.push([stream])
     assert e.value.is_retryable() == False
 
+
 def test_push_empty_stream(client: LokiClient):
     client.push([])
     stream = push_pb2.StreamAdapter(
