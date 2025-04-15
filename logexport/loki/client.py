@@ -51,13 +51,15 @@ class LokiClient:
             self.auth = None
 
     def push(self, streams: Iterable[push_pb2.StreamAdapter]):
-        if len(streams) == 0:
-            logging.info("Skipping push of 0 streams")
-            return
-
         push_request = push_pb2.PushRequest()
+        num_streams = 0
         for stream in streams:
             push_request.streams.append(stream)
+            num_streams += 1
+
+        if num_streams == 0:
+            logging.info("Skipping push of 0 streams")
+            return
 
         data: bytes = snappy.compress(push_request.SerializeToString())
 
