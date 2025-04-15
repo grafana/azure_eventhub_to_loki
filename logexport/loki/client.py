@@ -1,3 +1,4 @@
+import logging
 import urllib.parse
 from collections.abc import Iterable
 
@@ -50,6 +51,10 @@ class LokiClient:
             self.auth = None
 
     def push(self, streams: Iterable[push_pb2.StreamAdapter]):
+        if len(streams) == 0:
+            logging.info("Skipping push of 0 streams")
+            return
+
         push_request = push_pb2.PushRequest()
         for stream in streams:
             push_request.streams.append(stream)
