@@ -3,7 +3,7 @@ authors = [
   {name = "Grafana Labs"},
 ]
 dependencies = [
-  "azure-functions==1.21.1",
+  "azure-functions==1.24.0",
   "jq==1.8.0",
   "protobuf==5.28.3",
   "python-snappy==0.7.3",
