@@ -29,7 +29,7 @@ test = [
   "pytest==8.3.3",
   "testcontainers==4.8.2",
   "types-protobuf==5.28.3.20241030",
-  "types-requests==2.32.0.20241016",
+  "types-requests==2.32.4.20250913",
 ]
 
 [tool.black]
