@@ -7,7 +7,7 @@ dependencies = [
   "jq==1.8.0",
   "protobuf==5.29.5",
   "python-snappy==0.7.3",
-  "requests==2.32.3",
+  "requests==2.32.4",
 ]
 description = "Azure function to send eventhub events to Grafana Loki / Grafana Cloud"
 dynamic = ["version"]
