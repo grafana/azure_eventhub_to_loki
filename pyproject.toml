@@ -4,10 +4,10 @@ authors = [
 ]
 dependencies = [
   "azure-functions==1.24.0",
-  "jq==1.8.0",
+  "jq==1.10.0",
   "protobuf==5.29.5",
   "python-snappy==0.7.3",
-  "requests==2.32.4",
+  "requests==2.32.5",
 ]
 description = "Azure function to send eventhub events to Grafana Loki / Grafana Cloud"
 dynamic = ["version"]
@@ -24,7 +24,7 @@ package = [
 ]
 test = [
   "black==24.10.0",
-  "isort==6.0.1",
+  "isort==6.1.0",
   "mypy==1.18.2",
   "pytest==8.3.3",
   "testcontainers==4.8.2",
