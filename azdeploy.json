@@ -117,6 +117,7 @@
         "capacity": 1
       },
       "properties": {
+        "minimumTlsVersion": "1.2"
         "isAutoInflateEnabled": false,
         "maximumThroughputUnits": 0
       }
