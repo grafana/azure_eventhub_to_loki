@@ -32,6 +32,11 @@ def entry_from_event_record(
     if "correlationId" in load:
         entry.structuredMetadata.add(name="correlationId", value=load["correlationId"])
 
+    if "ResourceGroup" in load:
+        entry.structuredMetadata.add(name="resourceGroup", value=load["ResourceGroup"])
+    else:
+        entry.structuredMetadata.add(name="resourceGroup", value="undefined")
+
     entry.line = json.dumps(load)
 
     typ = load.get("type")
