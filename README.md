@@ -31,7 +31,7 @@ resource "azurerm_resource_group" "logexport" {
 resource "azurerm_resource_group_template_deployment" "logexport" {
   name                = "${azurerm_resource_group.logexport.name}-deploy"
   resource_group_name = azurerm_resource_group.logexport.name
-  deployment_mode     = "Complete"
+  deployment_mode     = "Incremental"
   template_content    = file("azdeploy.json")
 
   parameters_content = jsonencode({
