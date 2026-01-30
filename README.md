@@ -96,7 +96,7 @@ Once built the package can deployed to Azure using the Azure CLI:
 az functionapp deployment source config-zip -g <resource-group> -n <function-app-name> --src <path-to-zip-file>
 ```
 
-Changes to `logexport/_version.py` have been ignored with
+Changes to `logexport/_version.py` have been ignored with:
 
 ```bash
 git update-index --skip-worktree logexport/_version.py
