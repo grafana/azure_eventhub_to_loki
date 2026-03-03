@@ -24,7 +24,7 @@ package = [
 ]
 test = [
   "black==25.12.0",
-  "isort==7.0.0",
+  "isort==8.0.1",
   "mypy==1.19.0",
   "pytest==9.0.2",
   "testcontainers==4.13.3",
