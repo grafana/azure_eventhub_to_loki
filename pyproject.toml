@@ -23,7 +23,7 @@ package = [
   "setuptools_scm>=8",
 ]
 test = [
-  "black==25.12.0",
+  "black==26.3.0",
   "isort==7.0.0",
   "mypy==1.19.0",
   "pytest==9.0.2",
