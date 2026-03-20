@@ -14,7 +14,7 @@ VERSION_LABEL_KEY: Final[str] = "__grafana_azure_logexport_version__"
 
 def entry_from_event_record(
     load: dict, current_ts_nanos: int
-) -> Tuple[str | None, str | None, push_pb2.EntryAdapter]:
+) -> Tuple[str | None, str, str | None, push_pb2.EntryAdapter]:
     """Returns the category and type of the event and the entry."""
     entry = push_pb2.EntryAdapter()
 
@@ -32,10 +32,9 @@ def entry_from_event_record(
     if "correlationId" in load:
         entry.structuredMetadata.add(name="correlationId", value=load["correlationId"])
 
-    if "ResourceGroup" in load:
-        entry.structuredMetadata.add(name="resourceGroup", value=load["ResourceGroup"])
-    else:
-        entry.structuredMetadata.add(name="resourceGroup", value="undefined")
+    resource = load.get("ResourceGroup")
+    if resource is None:
+        resource = "undefined"
 
     entry.line = json.dumps(load)
 
@@ -43,7 +42,7 @@ def entry_from_event_record(
     if typ is None and load.get("ProductName") == "Microsoft Defender for Cloud":
         typ = "Alert/" + (load.get("AlertType") or "Unknown")
 
-    return load.get("category"), typ, entry
+    return load.get("category"), resource, typ, entry
 
 
 def stream_from_event_body(
@@ -64,14 +63,16 @@ def stream_from_event_body(
     for record in get_records(data):
         # Each record should receive it's own unique timestamp.
         current_ts += 1
-        category, type, entry = entry_from_event_record(record, current_ts)
+        category, resource, type, entry = entry_from_event_record(record, current_ts)
 
         for i in config.filter.apply(record):
             updated = push_pb2.EntryAdapter()
             updated.CopyFrom(entry)
             updated.line = json.dumps(i)
 
-            labels = create_labels_string(category, type, config.additional_labels)
+            labels = create_labels_string(
+                category, resource, type, config.additional_labels
+            )
             stream = stream_index.setdefault(
                 labels, push_pb2.StreamAdapter(labels=labels)
             )
@@ -105,7 +106,10 @@ def get_timestamp(load: dict) -> str | None:
 
 
 def create_labels_string(
-    category: str | None, type: str | None, addional_labels: dict[str, str]
+    category: str | None,
+    resource: str,
+    type: str | None,
+    addional_labels: dict[str, str],
 ) -> str:
     labels = 'job="integrations/azure-logexport"'
 
@@ -114,6 +118,9 @@ def create_labels_string(
 
     if category is not None:
         labels += f',category="{category}"'
+
+    labels += f',resource="{resource}"'
+
     if type is not None:
         labels += f',type="{type}"'
 
