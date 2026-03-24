@@ -59,7 +59,7 @@ def stream_from_event_body(
     for record in get_records(data):
         # Each record should receive it's own unique timestamp.
         current_ts += 1
-        category, resource, type, entry = entry_from_event_record(record, current_ts)
+        category, resource_group, type, entry = entry_from_event_record(record, current_ts)
 
         for i in config.filter.apply(record):
             updated = push_pb2.EntryAdapter()
@@ -67,7 +67,7 @@ def stream_from_event_body(
             updated.line = json.dumps(i)
 
             labels = create_labels_string(
-                category, resource, type, config.additional_labels
+                category, resource_group, type, config.additional_labels
             )
             stream = stream_index.setdefault(
                 labels, push_pb2.StreamAdapter(labels=labels)
