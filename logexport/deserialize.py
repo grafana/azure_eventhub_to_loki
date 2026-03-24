@@ -15,7 +15,7 @@ VERSION_LABEL_KEY: Final[str] = "__grafana_azure_logexport_version__"
 def entry_from_event_record(
     load: dict, current_ts_nanos: int
 ) -> Tuple[str | None, str | None, str | None, push_pb2.EntryAdapter]:
-    """Returns the category and type of the event and the entry."""
+    """Returns the category, resource group, and type of the event and the entry."""
     entry = push_pb2.EntryAdapter()
 
     ts = get_timestamp(load)
