@@ -50,8 +50,8 @@ def test_deserialization_records():
         TestCase(
             "tests/record_sample.json",
             [
-                '{job="integrations/azure-logexport",category="SQLSecurityAuditEvents",resource="rg-anonymized"}',
-                '{job="integrations/azure-logexport",category="SQLSecurityAuditEvents",resource="rg-anonymized",type="AuditEvent"}',
+                '{job="integrations/azure-logexport",category="SQLSecurityAuditEvents",resource_group="rg-anonymized"}',
+                '{job="integrations/azure-logexport",category="SQLSecurityAuditEvents",resource_group="rg-anonymized",type="AuditEvent"}',
             ],
         ),
         TestCase(
@@ -91,7 +91,7 @@ def test_deserialization_filter():
         assert len(streams) == 1
         assert (
             streams[0].labels
-            == '{job="integrations/azure-logexport",category="SQLSecurityAuditEvents",resource="rg-anonymized",type="AuditEvent"}'
+            == '{job="integrations/azure-logexport",category="SQLSecurityAuditEvents",resource_group="rg-anonymized",type="AuditEvent"}'
         )
 
 
@@ -225,5 +225,5 @@ def test_create_labels_string():
     )
     assert (
         create_labels_string("cat1", "res1", None, {"cluster": "dev"})
-        == '{job="integrations/azure-logexport",cluster="dev",category="cat1",resource="res1"}'
+        == '{job="integrations/azure-logexport",cluster="dev",category="cat1",resource_group="res1"}'
     )

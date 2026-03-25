@@ -105,7 +105,7 @@ def get_timestamp(load: dict) -> str | None:
 
 def create_labels_string(
     category: str | None,
-    resource: str | None,
+    resource_group: str | None,
     type: str | None,
     addional_labels: dict[str, str],
 ) -> str:
@@ -117,8 +117,8 @@ def create_labels_string(
     if category is not None:
         labels += f',category="{category}"'
 
-    if resource is not None:
-        labels += f',resource="{resource}"'
+    if resource_group is not None:
+        labels += f',resource_group="{resource_group}"'
 
     if type is not None:
         labels += f',type="{type}"'
