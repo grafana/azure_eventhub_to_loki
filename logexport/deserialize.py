@@ -59,7 +59,7 @@ def stream_from_event_body(
     for record in get_records(data):
         # Each record should receive it's own unique timestamp.
         current_ts += 1
-        (category, type, entry) = entry_from_event_record(record, current_ts)
+        category, type, entry = entry_from_event_record(record, current_ts)
 
         for i in config.filter.apply(record):
             updated = push_pb2.EntryAdapter()
