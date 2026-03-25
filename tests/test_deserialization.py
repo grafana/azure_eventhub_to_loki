@@ -22,7 +22,7 @@ def test_deserialization_message():
         "resourceId": "/SUBSCRIPTIONS/1234",
         "category": "cat1",
     }
-    (cat, _, entry) = entry_from_event_record(load, 0)
+    cat, _, entry = entry_from_event_record(load, 0)
 
     assert cat == "cat1"
     assert json.loads(entry.line) == {
