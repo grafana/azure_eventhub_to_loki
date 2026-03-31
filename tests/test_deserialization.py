@@ -13,6 +13,7 @@ from logexport.deserialize import (
 )
 from logexport.filter import Filter
 from logexport.push import push_pb2
+from logexport.resource import Resource
 
 
 def test_deserialization_message():
@@ -22,9 +23,9 @@ def test_deserialization_message():
         "resourceId": "/SUBSCRIPTIONS/1234",
         "category": "cat1",
     }
-    cat, _, entry = entry_from_event_record(load, 0)
+    resource, _, entry = entry_from_event_record(load, 0)
 
-    assert cat == "cat1"
+    assert resource.category == "cat1"
     assert json.loads(entry.line) == {
         "category": "cat1",
         "resourceId": "/SUBSCRIPTIONS/1234",
@@ -50,13 +51,15 @@ def test_deserialization_records():
         TestCase(
             "tests/record_sample.json",
             [
-                '{job="integrations/azure-logexport",category="SQLSecurityAuditEvents"}',
-                '{job="integrations/azure-logexport",category="SQLSecurityAuditEvents",type="AuditEvent"}',
+                '{job="integrations/azure-logexport",category="SQLSecurityAuditEvents",resourceGroup="RG-ANONYMIZED",resourceName="SQL-ANONYMIZED",resourceType="SERVERS"}',
+                '{job="integrations/azure-logexport",category="SQLSecurityAuditEvents",resourceGroup="RG-ANONYMIZED",resourceName="SQL-ANONYMIZED",resourceType="SERVERS",type="AuditEvent"}',
             ],
         ),
         TestCase(
             "tests/issue_15.json",
-            ['{job="integrations/azure-logexport"}'],
+            [
+                '{job="integrations/azure-logexport",resourceGroup="RG-DIAGNOSTICS",resourceName="<redacted_eventhub_namespace_name>",resourceType="NAMESPACES"}'
+            ],
         ),
         TestCase(
             "tests/issue_19_sample_1.json",
@@ -91,7 +94,7 @@ def test_deserialization_filter():
         assert len(streams) == 1
         assert (
             streams[0].labels
-            == '{job="integrations/azure-logexport",category="SQLSecurityAuditEvents",type="AuditEvent"}'
+            == '{job="integrations/azure-logexport",category="SQLSecurityAuditEvents",resourceGroup="RG-ANONYMIZED",resourceName="SQL-ANONYMIZED",resourceType="SERVERS",type="AuditEvent"}'
         )
 
 
@@ -204,21 +207,30 @@ def test_deserialization_timestamp():
 
 def test_create_labels_string():
     assert (
-        create_labels_string(None, None, {}) == '{job="integrations/azure-logexport"}'
+        create_labels_string(Resource("id", None, None, None, None), None, {})
+        == '{job="integrations/azure-logexport"}'
     )
     assert (
-        create_labels_string("cat1", "type1", {})
+        create_labels_string(Resource("", None, None, "cat1", None), "type1", {})
         == '{job="integrations/azure-logexport",category="cat1",type="type1"}'
     )
     assert (
-        create_labels_string(None, "type1", {})
+        create_labels_string(Resource("id", None, None, None, None), "type1", {})
         == '{job="integrations/azure-logexport",type="type1"}'
     )
     assert (
-        create_labels_string("cat1", None, {})
+        create_labels_string(Resource("", None, None, "cat1", None), None, {})
         == '{job="integrations/azure-logexport",category="cat1"}'
     )
     assert (
-        create_labels_string("cat1", None, {"cluster": "dev"})
+        create_labels_string(
+            Resource("", None, None, "cat1", None), None, {"cluster": "dev"}
+        )
         == '{job="integrations/azure-logexport",cluster="dev",category="cat1"}'
+    )
+    assert (
+        create_labels_string(
+            Resource("", None, "res1", "cat1", None), None, {"cluster": "dev"}
+        )
+        == '{job="integrations/azure-logexport",cluster="dev",category="cat1",resourceGroup="res1"}'
     )
