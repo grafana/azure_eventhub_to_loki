@@ -25,4 +25,5 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       with:
         files: logexport.*.zip
+        generate_release_notes: true
       
