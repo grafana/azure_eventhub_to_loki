@@ -8,13 +8,14 @@ from typing import Final, Iterator, Tuple
 from logexport._version import __version__
 from logexport.config import Config
 from logexport.push import push_pb2
+from logexport.resource import Resource, resource_from_id_and_category
 
 VERSION_LABEL_KEY: Final[str] = "__grafana_azure_logexport_version__"
 
 
 def entry_from_event_record(
     load: dict, current_ts_nanos: int
-) -> Tuple[str | None, str | None, str | None, push_pb2.EntryAdapter]:
+) -> Tuple[Resource, str | None, push_pb2.EntryAdapter]:
     """Returns the category, resource group, and type of the event and the entry."""
     entry = push_pb2.EntryAdapter()
 
@@ -26,19 +27,26 @@ def entry_from_event_record(
 
     entry.structuredMetadata.add(name=VERSION_LABEL_KEY, value=__version__)
 
+    resource = Resource("unknown", None, None, None, None)
     if "resourceId" in load:
         entry.structuredMetadata.add(name="resourceId", value=load["resourceId"])
+        resource = resource_from_id_and_category(
+            load["resourceId"], load.get("category")
+        )
 
     if "correlationId" in load:
         entry.structuredMetadata.add(name="correlationId", value=load["correlationId"])
 
     entry.line = json.dumps(load)
 
-    typ = load.get("type")
-    if typ is None and load.get("ProductName") == "Microsoft Defender for Cloud":
-        typ = "Alert/" + (load.get("AlertType") or "Unknown")
+    record_type = load.get("type")
+    if (
+        record_type is None
+        and load.get("ProductName") == "Microsoft Defender for Cloud"
+    ):
+        record_type = "Alert/" + (load.get("AlertType") or "Unknown")
 
-    return load.get("category"), load.get("ResourceGroup"), typ, entry
+    return resource, record_type, entry
 
 
 def stream_from_event_body(
@@ -59,9 +67,7 @@ def stream_from_event_body(
     for record in get_records(data):
         # Each record should receive it's own unique timestamp.
         current_ts += 1
-        category, resource_group, type, entry = entry_from_event_record(
-            record, current_ts
-        )
+        resource, record_type, entry = entry_from_event_record(record, current_ts)
 
         for i in config.filter.apply(record):
             updated = push_pb2.EntryAdapter()
@@ -69,7 +75,7 @@ def stream_from_event_body(
             updated.line = json.dumps(i)
 
             labels = create_labels_string(
-                category, resource_group, type, config.additional_labels
+                resource, record_type, config.additional_labels
             )
             stream = stream_index.setdefault(
                 labels, push_pb2.StreamAdapter(labels=labels)
@@ -104,9 +110,8 @@ def get_timestamp(load: dict) -> str | None:
 
 
 def create_labels_string(
-    category: str | None,
-    resource_group: str | None,
-    type: str | None,
+    resource: Resource,
+    record_type: str | None,
     addional_labels: dict[str, str],
 ) -> str:
     labels = 'job="integrations/azure-logexport"'
@@ -114,13 +119,19 @@ def create_labels_string(
     for key, value in addional_labels.items():
         labels += f',{key}="{value}"'
 
-    if category is not None:
-        labels += f',category="{category}"'
+    if resource.category is not None:
+        labels += f',category="{resource.category}"'
 
-    if resource_group is not None:
-        labels += f',resource_group="{resource_group}"'
+    if resource.group is not None:
+        labels += f',resourceGroup="{resource.group}"'
 
-    if type is not None:
-        labels += f',type="{type}"'
+    if resource.name is not None:
+        labels += f',resourceName="{resource.name}"'
+
+    if resource.typ is not None:
+        labels += f',resourceType="{resource.typ}"'
+
+    if record_type is not None:
+        labels += f',type="{record_type}"'
 
     return "{" + labels + "}"
