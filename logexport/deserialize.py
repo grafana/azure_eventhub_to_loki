@@ -39,6 +39,11 @@ def entry_from_event_record(
 
     entry.line = json.dumps(load)
 
+    # Override category for backwards compatibility.
+    cat = load.get("category")
+    if cat is not None:
+        resource.category = cat
+
     record_type = load.get("type")
     if (
         record_type is None
