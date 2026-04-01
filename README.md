@@ -87,6 +87,8 @@ Empty results are omitted. Thus the pipeline can also be used for filtering.
 
 ## Release
 
+A release is triggered by a new tag. Call `make release BUMP=<major|minor|patch>` to create a new tagged release.
+
 The logexport function is packaged as a ZIP file via `make "logexport.$(python -m setuptools_scm).zip"`. The version is
 derived from the `setuptools_scm` package. The build process also updates the version in the `_version.py` file.
 
