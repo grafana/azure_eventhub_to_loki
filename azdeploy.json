@@ -160,7 +160,7 @@
       "sku": {
         "name": "[parameters('storageAccountType')]"
       },
-      "kind": "Storage"
+      "kind": "StorageV2"
     },
     {
       "type": "Microsoft.Web/serverfarms",
