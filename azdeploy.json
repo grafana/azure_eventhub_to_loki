@@ -117,7 +117,7 @@
         "capacity": 1
       },
       "properties": {
-        "minimumTlsVersion": "1.2"
+        "minimumTlsVersion": "1.2",
         "isAutoInflateEnabled": false,
         "maximumThroughputUnits": 0
       }
@@ -199,9 +199,13 @@
       "kind": "functionapp,linux",
       "properties": {
         "reserved": true,
+        "httpsOnly": true,
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
         "siteConfig": {
           "linuxFxVersion": "python|3.11",
+          "minTlsVersion": "1.2",
+          "scmMinTlsVersion": "1.2",
+          "ftpsState": "Disabled",
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
