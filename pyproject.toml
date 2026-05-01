@@ -29,7 +29,7 @@ test = [
   "mypy==1.20.2",
   "pytest==9.0.3",
   "testcontainers==4.14.2",
-  "types-protobuf==6.32.1.20251105",
+  "types-protobuf==7.34.1.20260408",
   "types-requests==2.33.0.20260408",
 ]
 
