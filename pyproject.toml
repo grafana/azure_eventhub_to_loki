@@ -26,7 +26,7 @@ package = [
 test = [
   "black==26.3.1",
   "isort==8.0.1",
-  "mypy==2.2.0",
+  "mypy==2.3.0",
   "pytest==9.1.1",
   "testcontainers==4.14.2",
   "types-protobuf==7.34.1.20260518",
