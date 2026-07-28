@@ -103,12 +103,13 @@
     "eventHubAuthorizationRuleName": "[parameters('functionAppName')]",
     "eventHubName": "[parameters('eventHubName')]",
     "eventHubNamespaceName": "[parameters('functionAppName')]",
-    "storageAccountName": "[format('logexport{0}', uniqueString(resourceGroup().id))]"
+    "storageAccountName": "[format('logexport{0}', uniqueString(resourceGroup().id))]",
+    "eventHubMessageRetentionInDays": "[if(equals(parameters('eventHubSku'), 'Basic'), 1, 7)]"
   },
   "resources": [
     {
       "type": "Microsoft.EventHub/namespaces",
-      "apiVersion": "2021-11-01",
+      "apiVersion": "2024-01-01",
       "name": "[variables('eventHubNamespaceName')]",
       "location": "[parameters('location')]",
       "sku": {
@@ -127,7 +128,7 @@
       "apiVersion": "2021-11-01",
       "name": "[format('{0}/{1}', variables('eventHubNamespaceName'), variables('eventHubName'))]",
       "properties": {
-        "messageRetentionInDays": 7,
+        "messageRetentionInDays": "[variables('eventHubMessageRetentionInDays')]",
         "partitionCount": 1,
         "messageTimestampDescription": {
           "timestampType": "LogAppend"
@@ -160,7 +161,12 @@
       "sku": {
         "name": "[parameters('storageAccountType')]"
       },
-      "kind": "Storage"
+      "kind": "StorageV2",
+      "properties": {
+        "minimumTlsVersion": "TLS1_2",
+        "supportsHttpsTrafficOnly": true,
+        "allowBlobPublicAccess": false
+      }
     },
     {
       "type": "Microsoft.Web/serverfarms",
