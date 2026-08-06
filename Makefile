@@ -36,6 +36,6 @@ release:
 		*) echo "Invalid BUMP value: $(BUMP). Use major, minor, or patch." && exit 1 ;; \
 	esac; \
 	VERSION="$$MAJOR.$$MINOR.$$PATCH"; \
-	echo "Tagging release $$VERSION" (was $$LATEST)"; \
+	echo "Tagging release $$VERSION was $$LATEST"; \
 	git tag -a "$$VERSION" -m "Release $$VERSION"; \
 	echo "Tag $$VERSION created. Push with: git push origin $$VERSION"
