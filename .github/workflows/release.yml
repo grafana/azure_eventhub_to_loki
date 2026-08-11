@@ -1,6 +1,6 @@
 name: CI 
 
-on: [ push, pull_request ]
+on: [ push ]
 
 jobs:
   build:
@@ -14,7 +14,13 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install .
-        pip install .[test]
-    - run: make lint
-    - run: EVENTHUB_NAME=test pytest .
+        pip install .[package]
+    - name: Package
+      run: make clean "logexport.$(python -m setuptools_scm).zip"
+    - name: Release
+      uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: logexport.*.zip
+        generate_release_notes: true
       
