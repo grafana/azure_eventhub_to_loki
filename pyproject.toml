@@ -27,7 +27,7 @@ test = [
   "black==26.10.1",
   "isort==9.0.2",
   "mypy==2.4.0",
-  "pytest==9.1.1",
+  "pytest==9.2.0",
   "testcontainers==4.15.0",
   "types-protobuf==7.35.1.20260906",
   "types-requests==2.33.0.20261006",
